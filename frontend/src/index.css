@@ -20,3 +20,6 @@ input,textarea,button{font-family:inherit}
 .btn:hover{transform:translateY(-2px)}
 .btn-p{transition:transform .25s,box-shadow .25s,background .25s;cursor:pointer}
 .btn-p:hover{transform:translateY(-2px);box-shadow:0 14px 30px -10px rgba(107,78,142,.7);background:#8160A8!important}
+.pill{transition:background .25s,border-color .25s,transform .2s}
+.pill:hover{background:rgba(107,78,142,.3)!important;border-color:#9678BE!important}
+.pill-on{background:#6B4E8E!important;border-color:#6B4E8E!important;color:#fff!important}
