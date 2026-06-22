@@ -1,0 +1,14 @@
+:root {
+  --bg-deep:#1A0F26; --primary:#301D3D; --accent:#6B4E8E;
+  --accent-hover:#8160A8; --accent-light:#9678BE; --accent-lighter:#C5B2E0;
+  --ink:#F3EEF8; --muted:#B5A6C7; --faint:#897A9E; --soft:#C9BCD9;
+  --card-bg:rgba(255,255,255,.025); --border:rgba(255,255,255,.08);
+  --border-accent:rgba(150,120,190,.3);
+  --page-bg:linear-gradient(172deg,#1A0F26,#2A1A3C 65%,#301D3D);
+}
+@keyframes ngpFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes ngpRot{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{transform:translateY(12px)}to{transform:translateY(0)}}
+.view-enter{animation:fadeUp .4s ease}
+.card-lift{transition:transform .35s cubic-bezier(.2,.7,.2,1),border-color .35s,box-shadow .35s}
+.card-lift:hover{transform:translateY(-6px);border-color:rgba(150,120,190,.6)!important;box-shadow:var(--tw-shadow,0 24px 50px -24px rgba(107,78,142,.55))}

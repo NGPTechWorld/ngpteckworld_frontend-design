@@ -1,0 +1,16 @@
+@import './styles/tokens.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg-deep);-webkit-font-smoothing:antialiased;color:var(--ink)}
+::selection{background:#6B4E8E;color:#fff}
+::-webkit-scrollbar{width:10px}
+::-webkit-scrollbar-track{background:#1A0F26}
+::-webkit-scrollbar-thumb{background:#3a2a55;border-radius:8px}
+a{text-decoration:none;color:inherit}
+input,textarea,button{font-family:inherit}
+[dir="rtl"]{font-family:'Cairo',sans-serif}
+[dir="ltr"]{font-family:'Poppins','Cairo',sans-serif}
