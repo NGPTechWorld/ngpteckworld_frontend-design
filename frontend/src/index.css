@@ -14,7 +14,8 @@ a{text-decoration:none;color:inherit}
 input,textarea,button{font-family:inherit}
 [dir="rtl"]{font-family:'Cairo',sans-serif}
 [dir="ltr"]{font-family:'Poppins','Cairo',sans-serif}
-@media (max-width:860px){ [data-navlinks]{display:none!important} }
+@media (max-width:860px){ [data-navlinks]{display:none!important} [data-hero],[data-grid4],[data-grid2]{grid-template-columns:1fr!important} [data-grid3]{grid-template-columns:1fr 1fr!important} [data-detail]{grid-template-columns:1fr!important} }
+@media (max-width:560px){ [data-grid3]{grid-template-columns:1fr!important} }
 .btn{transition:transform .25s,box-shadow .25s,background .25s;cursor:pointer}
 .btn:hover{transform:translateY(-2px)}
 .btn-p{transition:transform .25s,box-shadow .25s,background .25s;cursor:pointer}
