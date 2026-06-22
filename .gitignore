@@ -1,0 +1,7 @@
+node_modules/
+/backend/vendor/
+/backend/.env
+/backend/storage/*.key
+/frontend/dist/
+.DS_Store
+.superpowers/
