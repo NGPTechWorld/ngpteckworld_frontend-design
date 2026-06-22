@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { api } from '../lib/api'
 import { useLang } from '../i18n/LanguageContext'
 import Button from '../components/Button'
@@ -66,7 +67,7 @@ export default function Home() {
           {services.map((s) => <ServiceCard key={s.id} service={s} />)}
         </div>
         <div className="mt-[30px] text-center">
-          <a href="/services" className="font-semibold text-accent-light">{t.servicesAll}</a>
+          <Link to="/services" className="font-semibold text-accent-light">{t.servicesAll}</Link>
         </div>
       </section>
 

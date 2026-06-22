@@ -1,7 +1,4 @@
-import { useLang } from '../i18n/LanguageContext'
-
 export default function Lightbox({ bg, label, onClose }) {
-  const { isAr } = useLang()
   return (
     <div onClick={onClose} className="fixed inset-0 z-[100] flex items-center justify-center p-10"
       style={{ background: 'rgba(10,6,16,.9)', backdropFilter: 'blur(6px)', cursor: 'zoom-out' }}>

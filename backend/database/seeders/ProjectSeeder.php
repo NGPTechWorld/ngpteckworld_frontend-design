@@ -9,6 +9,7 @@ class ProjectSeeder extends Seeder
 {
     public function run(): void
     {
+        Project::query()->delete();
         foreach (\App\Support\SeedData::projects() as $i => $p) {
             $team = $p['team'];
             $links = $p['links'];
