@@ -115,4 +115,7 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
+    'contact_notify' => env('CONTACT_NOTIFY_EMAIL', 'info@ngptechworld.com'),
+    'contact_enabled' => env('CONTACT_MAIL_ENABLED', false),
+
 ];
