@@ -23,3 +23,5 @@ input,textarea,button{font-family:inherit}
 .pill{transition:background .25s,border-color .25s,transform .2s}
 .pill:hover{background:rgba(107,78,142,.3)!important;border-color:#9678BE!important}
 .pill-on{background:#6B4E8E!important;border-color:#6B4E8E!important;color:#fff!important}
+.glink{transition:transform .25s,background .25s}
+.glink:hover{transform:scale(1.04)}
