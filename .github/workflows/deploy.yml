@@ -1,6 +1,6 @@
 name: Deploy to serv00
 
-# يعمل deploy تلقائياً عند الدفع على main، أو يدوياً من تبويب Actions
+# يعمل deploy تلقائياً عند الدفع على backend، أو يدوياً من تبويب Actions
 on:
   push:
     branches: [ backend ]
@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Pull latest code on the server
-        uses: appleboy/ssh-action@v1.2.0
+        uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ secrets.SERV00_HOST }}
           username: ${{ secrets.SERV00_USER }}
@@ -33,7 +33,7 @@ jobs:
 
             echo "==> سحب آخر نسخة"
             git fetch origin
-            git reset --hard origin/main
+            git reset --hard origin/backend
 
             echo "==> تثبيت الحزم (إن تغيّرت)"
             composer install --no-interaction --prefer-dist --optimize-autoloader || true
