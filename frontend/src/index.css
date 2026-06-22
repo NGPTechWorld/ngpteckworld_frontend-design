@@ -14,3 +14,8 @@ a{text-decoration:none;color:inherit}
 input,textarea,button{font-family:inherit}
 [dir="rtl"]{font-family:'Cairo',sans-serif}
 [dir="ltr"]{font-family:'Poppins','Cairo',sans-serif}
+@media (max-width:860px){ [data-navlinks]{display:none!important} }
+.btn{transition:transform .25s,box-shadow .25s,background .25s;cursor:pointer}
+.btn:hover{transform:translateY(-2px)}
+.btn-p{transition:transform .25s,box-shadow .25s,background .25s;cursor:pointer}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 14px 30px -10px rgba(107,78,142,.7);background:#8160A8!important}
