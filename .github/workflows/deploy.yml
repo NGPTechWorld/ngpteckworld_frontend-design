@@ -1,0 +1,49 @@
+name: Deploy to serv00
+
+# يعمل deploy تلقائياً عند الدفع على main، أو يدوياً من تبويب Actions
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+# لا تشغّل أكثر من deploy بنفس الوقت
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: SSH deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull latest code on the server
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SERV00_HOST }}
+          username: ${{ secrets.SERV00_USER }}
+          port: ${{ secrets.SERV00_PORT }}
+          key: ${{ secrets.SERV00_SSH_KEY }}
+          script: |
+            set -e
+            # تحميل البيئة للحصول على مسارات php و composer
+            source ~/.bash_profile 2>/dev/null || true
+            source ~/.profile 2>/dev/null || true
+
+            cd ~/domains/ngp.ngptechworld.serv00.net/public_html
+
+            echo "==> سحب آخر نسخة"
+            git fetch origin
+            git reset --hard origin/main
+
+            echo "==> تثبيت الحزم (إن تغيّرت)"
+            composer install --no-interaction --prefer-dist --optimize-autoloader || true
+
+            echo "==> تشغيل الترحيلات"
+            php artisan migrate --force || true
+
+            echo "==> تنظيف الكاش"
+            php artisan config:clear || true
+            php artisan route:clear || true
+            php artisan view:clear || true
+
+            echo "==> تم النشر بنجاح"
