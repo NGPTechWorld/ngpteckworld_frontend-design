@@ -23,7 +23,7 @@ export default function Footer() {
           <div className="mb-3.5 text-[15px] font-semibold">{t.navContact}</div>
           <div className="flex flex-col gap-2.5 text-[14px] text-muted">
             <span dir="ltr">info@ngptechworld.com</span>
-            <span dir="ltr">+963 933 069 105</span>
+            <span dir="ltr">+963 933 069 105 </span>
           </div>
         </div>
       </div>
