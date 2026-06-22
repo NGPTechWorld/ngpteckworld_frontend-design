@@ -7,6 +7,7 @@ import TeamCard from '../components/TeamCard'
 import Lightbox from '../components/Lightbox'
 import Icon from '../components/Icon'
 import { galleryBgs } from '../lib/visuals'
+import PageTitle from '../components/PageTitle'
 
 export default function ProjectDetail() {
   const { slug } = useParams()
@@ -28,6 +29,7 @@ export default function ProjectDetail() {
 
   return (
     <div className="view-enter mx-auto max-w-narrow px-[26px] pb-[90px] pt-10">
+      <PageTitle title={pick(project, 'name')} />
       <Link to="/portfolio" className="mb-6 inline-flex items-center gap-2 text-[14px] text-accent-light">{t.dBack}</Link>
 
       <div className="mb-2 flex flex-wrap items-center gap-3.5">

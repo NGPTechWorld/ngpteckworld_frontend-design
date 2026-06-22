@@ -1,11 +1,13 @@
 import { useLang } from '../i18n/LanguageContext'
 import Icon from '../components/Icon'
 import { iconPaths } from '../lib/visuals'
+import PageTitle from '../components/PageTitle'
 
 export default function About() {
   const { t } = useLang()
   return (
     <div className="view-enter mx-auto max-w-narrow px-[26px] pb-[90px] pt-[70px]">
+      <PageTitle title={t.aboutTitle} />
       <div className="mb-[50px] text-center">
         <div className="mb-2.5 font-mono text-[13px] text-accent-light">// {t.navAbout}</div>
         <h1 className="mb-[18px] text-[44px] font-extrabold">{t.aboutTitle}</h1>

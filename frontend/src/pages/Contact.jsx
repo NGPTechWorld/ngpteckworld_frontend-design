@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { api } from '../lib/api'
 import { useLang } from '../i18n/LanguageContext'
 import Icon from '../components/Icon'
+import PageTitle from '../components/PageTitle'
 
 const inputCls = 'rounded-[11px] border border-white/[.14] px-4 py-3.5 text-[14.5px] text-white outline-none'
 const inputStyle = { background: 'rgba(26,15,38,.6)' }
@@ -27,6 +28,7 @@ export default function Contact() {
 
   return (
     <div className="view-enter mx-auto max-w-[1100px] px-[26px] pb-[90px] pt-[70px]">
+      <PageTitle title={t.contactTitle} />
       <div className="mb-[50px] text-center">
         <div className="mb-2.5 font-mono text-[13px] text-accent-light">// {t.navContact}</div>
         <h1 className="mb-3.5 text-[44px] font-extrabold">{t.contactTitle}</h1>

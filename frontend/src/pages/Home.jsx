@@ -6,6 +6,7 @@ import SectionHeader from '../components/SectionHeader'
 import ServiceCard from '../components/ServiceCard'
 import ProjectCard from '../components/ProjectCard'
 import CTASection from '../components/CTASection'
+import PageTitle from '../components/PageTitle'
 
 export default function Home() {
   const { t } = useLang()
@@ -19,6 +20,7 @@ export default function Home() {
 
   return (
     <div className="view-enter">
+      <PageTitle title={t.navHome} />
       {/* HERO */}
       <section data-hero className="mx-auto grid max-w-site items-center gap-10 px-[26px] pb-[70px] pt-[84px]" style={{ gridTemplateColumns: '1.1fr .9fr' }}>
         <div>
