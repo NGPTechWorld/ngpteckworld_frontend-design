@@ -3,7 +3,7 @@ name: Deploy to serv00
 # يعمل deploy تلقائياً عند الدفع على main، أو يدوياً من تبويب Actions
 on:
   push:
-    branches: [ main ]
+    branches: [ backend ]
   workflow_dispatch:
 
 # لا تشغّل أكثر من deploy بنفس الوقت
