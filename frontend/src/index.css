@@ -19,6 +19,7 @@ input,textarea,button{font-family:inherit}
 @media (max-width:860px){
   [data-navlinks]{display:none!important}
   [data-burger]{display:inline-flex!important}
+  [data-navctrls]{margin-inline-start:auto!important}
   [data-hero],[data-grid2]{grid-template-columns:1fr!important}
   [data-grid3]{grid-template-columns:1fr 1fr!important}
   [data-grid4]{grid-template-columns:1fr 1fr!important}
@@ -48,3 +49,10 @@ input,textarea,button{font-family:inherit}
 .pill-on{background:#6B4E8E!important;border-color:#6B4E8E!important;color:#fff!important}
 .glink{transition:transform .25s,background .25s}
 .glink:hover{transform:scale(1.04)}
+/* scroll reveal (only active once JS marks the doc ready, so content is never hidden if JS fails) */
+.fx-ready [data-reveal]{opacity:0;transform:translateY(30px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
+.fx-ready [data-reveal].in{opacity:1;transform:none}
+@keyframes ngpGoldPulse{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:1;transform:scale(1.06)}}
+@media (prefers-reduced-motion: reduce){
+  .fx-ready [data-reveal]{opacity:1!important;transform:none!important}
+}

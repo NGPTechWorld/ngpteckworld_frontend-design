@@ -60,7 +60,7 @@ export default function Contact() {
         </div>
 
         <form onSubmit={onSubmit} className="flex flex-col gap-3.5 rounded-card border border-[var(--border)] bg-[var(--card-bg)] p-[30px]">
-          <div className="grid gap-3.5" style={{ gridTemplateColumns: '1fr 1fr' }}>
+          <div data-grid2 className="grid gap-3.5" style={{ gridTemplateColumns: '1fr 1fr' }}>
             <input required placeholder={t.fName} value={form.name} onChange={set('name')} className={inputCls} style={inputStyle} />
             <input required placeholder={t.fPhone} value={form.phone} onChange={set('phone')} dir="ltr" className={inputCls} style={{ ...inputStyle, textAlign: 'start' }} />
           </div>

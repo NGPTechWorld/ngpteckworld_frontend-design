@@ -37,19 +37,20 @@ export default function Home() {
           </div>
         </div>
         <div className="relative flex min-h-[320px] items-center justify-center">
+          <div className="absolute h-[340px] w-[340px] rounded-full" style={{ background: 'radial-gradient(circle,rgba(201,168,106,.30),transparent 64%)', filter: 'blur(6px)', animation: 'ngpGoldPulse 5.5s ease-in-out infinite' }} />
           <div className="absolute h-[300px] w-[300px] rounded-full" style={{ background: 'radial-gradient(circle,rgba(107,78,142,.4),transparent 68%)' }} />
-          <div className="absolute h-[330px] w-[330px] rounded-full border border-dashed" style={{ borderColor: 'rgba(150,120,190,.25)', animation: 'ngpRot 44s linear infinite' }} />
-          <img src="/assets/ngp-mark-white.png" alt="NGP" className="relative w-[170px]" style={{ animation: 'ngpFloat 6s ease-in-out infinite', filter: 'drop-shadow(0 0 28px rgba(150,120,190,.5))' }} />
+          <div className="absolute h-[330px] w-[330px] rounded-full border border-dashed" style={{ borderColor: 'rgba(201,168,106,.30)', animation: 'ngpRot 44s linear infinite' }} />
+          <img src="/assets/ngp-mark-white.png" alt="NGP" className="relative w-[170px]" style={{ animation: 'ngpFloat 6s ease-in-out infinite', filter: 'drop-shadow(0 0 26px rgba(150,120,190,.5)) drop-shadow(0 0 42px rgba(201,168,106,.45))' }} />
         </div>
       </section>
 
       {/* INTRO */}
-      <section className="mx-auto max-w-[1000px] px-[26px] pb-[70px] pt-[30px] text-center">
+      <section data-reveal className="mx-auto max-w-[1000px] px-[26px] pb-[70px] pt-[30px] text-center">
         <p className="text-[22px] font-medium leading-[1.9]" style={{ color: '#D8CEE6' }}>{t.intro}</p>
       </section>
 
       {/* PROMO */}
-      <section className="mx-auto max-w-site px-[26px] pb-[80px]">
+      <section data-reveal className="mx-auto max-w-site px-[26px] pb-[80px]">
         <div className="mx-auto w-full" style={{ maxWidth: 1280 }}>
           <div
             style={{
@@ -66,15 +67,16 @@ export default function Home() {
               src="/ngp-promo-embed.html"
               title="NGP TechWorld Promo"
               loading="lazy"
+              scrolling="no"
               allowFullScreen
-              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0 }}
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0, overflow: 'hidden' }}
             />
           </div>
         </div>
       </section>
 
       {/* STATS */}
-      <section className="mx-auto max-w-site px-[26px] pb-20">
+      <section data-reveal className="mx-auto max-w-site px-[26px] pb-20">
         <div data-grid4 className="grid gap-[18px]" style={{ gridTemplateColumns: 'repeat(4,1fr)' }}>
           {t.stats.map((s, i) => (
             <div key={i} className="rounded-card border border-[var(--border)] bg-[var(--card-bg)] px-[22px] py-7 text-center">
@@ -86,7 +88,7 @@ export default function Home() {
       </section>
 
       {/* SERVICES PREVIEW */}
-      <section className="mx-auto max-w-site px-[26px] pb-20">
+      <section data-reveal className="mx-auto max-w-site px-[26px] pb-20">
         <SectionHeader kicker={t.servicesKick} title={t.servicesTitle} />
         <div data-grid3 className="grid gap-[18px]" style={{ gridTemplateColumns: 'repeat(3,1fr)' }}>
           {services.map((s) => <ServiceCard key={s.id} service={s} />)}
@@ -97,7 +99,7 @@ export default function Home() {
       </section>
 
       {/* FEATURED PROJECTS */}
-      <section className="mx-auto max-w-site px-[26px] pb-[90px]">
+      <section data-reveal className="mx-auto max-w-site px-[26px] pb-[90px]">
         <SectionHeader kicker={t.featuredKick} title={t.featuredTitle} />
         <div data-grid3 className="grid gap-[18px]" style={{ gridTemplateColumns: 'repeat(3,1fr)' }}>
           {featured.map((p) => <ProjectCard key={p.id} project={p} />)}

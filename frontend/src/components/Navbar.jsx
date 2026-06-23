@@ -22,31 +22,33 @@ export default function Navbar() {
             <NavLink key={to} to={to} end={to === '/'} className={linkClass}>{label}</NavLink>
           ))}
         </div>
-        <button onClick={toggle} className="btn min-w-[42px] rounded-full border border-white/15 bg-transparent px-3 py-2 font-poppins text-[13px] font-semibold text-ink">
-          {t.langBtn}
-        </button>
-        <Link to="/contact" data-navcta className="btn-p rounded-full bg-accent px-5 py-2.5 text-[14px] font-semibold text-white">
-          {t.navCta}
-        </Link>
-        <button
-          data-burger
-          aria-label="Menu"
-          aria-expanded={open}
-          onClick={() => setOpen((o) => !o)}
-          className="items-center justify-center rounded-lg border border-white/15 p-2 text-ink"
-        >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            {open ? (
-              <path d="M6 6l12 12M18 6L6 18" />
-            ) : (
-              <>
-                <path d="M3 6h18" />
-                <path d="M3 12h18" />
-                <path d="M3 18h18" />
-              </>
-            )}
-          </svg>
-        </button>
+        <div data-navctrls className="flex items-center gap-3 sm:gap-4">
+          <button onClick={toggle} className="btn min-w-[42px] rounded-full border border-white/15 bg-transparent px-3 py-2 font-poppins text-[13px] font-semibold text-ink">
+            {t.langBtn}
+          </button>
+          <Link to="/contact" data-navcta className="btn-p rounded-full bg-accent px-5 py-2.5 text-[14px] font-semibold text-white">
+            {t.navCta}
+          </Link>
+          <button
+            data-burger
+            aria-label="Menu"
+            aria-expanded={open}
+            onClick={() => setOpen((o) => !o)}
+            className="items-center justify-center rounded-lg border border-white/15 p-2 text-ink"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              {open ? (
+                <path d="M6 6l12 12M18 6L6 18" />
+              ) : (
+                <>
+                  <path d="M3 6h18" />
+                  <path d="M3 12h18" />
+                  <path d="M3 18h18" />
+                </>
+              )}
+            </svg>
+          </button>
+        </div>
       </div>
 
       {open && (
