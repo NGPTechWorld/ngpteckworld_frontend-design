@@ -41,7 +41,10 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
+            // serv00 free hosting blocks the public/storage symlink (403), so images
+            // are exposed via a `media` symlink/folder at the web root that points to
+            // storage/app/public. URLs are emitted as APP_URL/media/... accordingly.
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/media',
             'visibility' => 'public',
             'throw' => false,
             'report' => false,

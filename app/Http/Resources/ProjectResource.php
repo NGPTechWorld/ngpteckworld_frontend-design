@@ -21,8 +21,8 @@ class ProjectResource extends JsonResource
             'short_en'       => $this->short_en,
             'description_ar' => $this->description_ar,
             'description_en' => $this->description_en,
-            'cover_image'    => $this->cover_image ? asset('storage/' . $this->cover_image) : null,
-            'gallery'        => collect($this->gallery ?? [])->map(fn ($p) => asset('storage/' . $p)),
+            'cover_image'    => $this->cover_image ? asset('media/' .$this->cover_image) : null,
+            'gallery'        => collect($this->gallery ?? [])->map(fn ($p) => asset('media/' .$p)),
             'video_url'      => $this->video_url,
             'featured'       => $this->featured,
             'team'           => $this->teamMembers->map(fn ($m) => [
@@ -31,7 +31,7 @@ class ProjectResource extends JsonResource
                 'role_en'  => $m->role_en,
                 'tasks_ar' => $m->tasks_ar,
                 'tasks_en' => $m->tasks_en,
-                'avatar'   => $m->avatar ? asset('storage/' . $m->avatar) : null,
+                'avatar'   => $m->avatar ? asset('media/' .$m->avatar) : null,
             ]),
             'links' => $this->links->map(fn ($l) => [
                 'type' => $l->type,

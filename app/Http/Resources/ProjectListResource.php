@@ -19,7 +19,7 @@ class ProjectListResource extends JsonResource
             'name_en'     => $this->name_en,
             'short_ar'    => $this->short_ar,
             'short_en'    => $this->short_en,
-            'cover_image' => $this->cover_image ? asset('storage/' . $this->cover_image) : null,
+            'cover_image' => $this->cover_image ? asset('media/' . $this->cover_image) : null,
             'featured'    => $this->featured,
         ];
     }
