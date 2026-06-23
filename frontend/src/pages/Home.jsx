@@ -48,6 +48,31 @@ export default function Home() {
         <p className="text-[22px] font-medium leading-[1.9]" style={{ color: '#D8CEE6' }}>{t.intro}</p>
       </section>
 
+      {/* PROMO */}
+      <section className="mx-auto max-w-site px-[26px] pb-[80px]">
+        <div className="mx-auto w-full" style={{ maxWidth: 1280 }}>
+          <div
+            style={{
+              position: 'relative',
+              width: '100%',
+              aspectRatio: '16 / 9',
+              borderRadius: 14,
+              overflow: 'hidden',
+              border: '1px solid var(--border)',
+              boxShadow: '0 24px 60px -30px rgba(107,78,142,.6)',
+            }}
+          >
+            <iframe
+              src="/ngp-promo-embed.html"
+              title="NGP TechWorld Promo"
+              loading="lazy"
+              allowFullScreen
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0 }}
+            />
+          </div>
+        </div>
+      </section>
+
       {/* STATS */}
       <section className="mx-auto max-w-site px-[26px] pb-20">
         <div data-grid4 className="grid gap-[18px]" style={{ gridTemplateColumns: 'repeat(4,1fr)' }}>

@@ -14,8 +14,31 @@ a{text-decoration:none;color:inherit}
 input,textarea,button{font-family:inherit}
 [dir="rtl"]{font-family:'Cairo',sans-serif}
 [dir="ltr"]{font-family:'Poppins','Cairo',sans-serif}
-@media (max-width:860px){ [data-navlinks]{display:none!important} [data-hero],[data-grid4],[data-grid2]{grid-template-columns:1fr!important} [data-grid3]{grid-template-columns:1fr 1fr!important} [data-detail]{grid-template-columns:1fr!important} }
-@media (max-width:560px){ [data-grid3]{grid-template-columns:1fr!important} }
+/* burger hidden on desktop; shown on mobile via media query below */
+[data-burger]{display:none}
+@media (max-width:860px){
+  [data-navlinks]{display:none!important}
+  [data-burger]{display:inline-flex!important}
+  [data-hero],[data-grid2]{grid-template-columns:1fr!important}
+  [data-grid3]{grid-template-columns:1fr 1fr!important}
+  [data-grid4]{grid-template-columns:1fr 1fr!important}
+  [data-detail]{grid-template-columns:1fr!important}
+}
+@media (max-width:560px){
+  [data-grid3]{grid-template-columns:1fr!important}
+  [data-navcta]{display:none!important}
+  .px-\[26px\]{padding-left:18px!important;padding-right:18px!important}
+}
+@media (max-width:480px){
+  [data-grid4]{grid-template-columns:1fr!important}
+}
+/* fluid headings + hero spacing on small screens */
+@media (max-width:640px){
+  h1{font-size:clamp(28px,8vw,40px)!important;line-height:1.18!important}
+  h2{font-size:clamp(22px,6vw,30px)!important}
+  h3{font-size:clamp(17px,4.5vw,20px)!important}
+  [data-hero]{padding-top:56px!important}
+}
 .btn{transition:transform .25s,box-shadow .25s,background .25s;cursor:pointer}
 .btn:hover{transform:translateY(-2px)}
 .btn-p{transition:transform .25s,box-shadow .25s,background .25s;cursor:pointer}
