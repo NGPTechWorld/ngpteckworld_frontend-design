@@ -10,14 +10,21 @@ import CTASection from '../components/CTASection'
 import PageTitle from '../components/PageTitle'
 
 export default function Home() {
-  const { t } = useLang()
+  const { t, pick } = useLang()
   const [services, setServices] = useState([])
   const [featured, setFeatured] = useState([])
+  const [stats, setStats] = useState(null)
 
   useEffect(() => {
+    api.getStats().then(setStats).catch(() => {})
     api.getServices().then((s) => setServices(s.slice(0, 3))).catch(() => {})
     api.getProjects().then((p) => setFeatured(p.slice(0, 3))).catch(() => {})
   }, [])
+
+  // Prefer dashboard-managed stats; fall back to the static dictionary.
+  const statList = stats && stats.length
+    ? stats.map((s) => ({ n: s.value, l: pick(s, 'label') }))
+    : t.stats
 
   return (
     <div className="view-enter">
@@ -78,7 +85,7 @@ export default function Home() {
       {/* STATS */}
       <section data-reveal className="mx-auto max-w-site px-[26px] pb-20">
         <div data-grid4 className="grid gap-[18px]" style={{ gridTemplateColumns: 'repeat(4,1fr)' }}>
-          {t.stats.map((s, i) => (
+          {statList.map((s, i) => (
             <div key={i} className="rounded-card border border-[var(--border)] bg-[var(--card-bg)] px-[22px] py-7 text-center">
               <div className="font-poppins text-[42px] font-bold text-accent-light">{s.n}</div>
               <div className="mt-1 text-[14.5px] text-muted">{s.l}</div>

@@ -15,6 +15,7 @@ async function req(path, options) {
 }
 
 export const api = {
+  getStats: async () => (await req('/stats')).data,
   getServices: async () => (await req('/services')).data,
   getProjects: async (category) =>
     (await req(`/projects${category && category !== 'all' ? `?category=${category}` : ''}`)).data,
