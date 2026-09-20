@@ -28,7 +28,7 @@ export default function Contact() {
 
   return (
     <div className="view-enter mx-auto max-w-[1100px] px-[26px] pb-[90px] pt-[70px]">
-      <PageTitle title={t.contactTitle} />
+      <PageTitle title={t.contactTitle} description={t.contactSub} />
       <div className="mb-[50px] text-center">
         <div className="mb-2.5 font-mono text-[13px] text-accent-light">// {t.navContact}</div>
         <h1 className="mb-3.5 text-[44px] font-extrabold">{t.contactTitle}</h1>
