@@ -7,6 +7,10 @@ import SectionHeader from '../components/SectionHeader'
 import ServiceCard from '../components/ServiceCard'
 import ProjectCard from '../components/ProjectCard'
 import CTASection from '../components/CTASection'
+import ProcessSteps from '../components/ProcessSteps'
+import Testimonials from '../components/Testimonials'
+import Partners from '../components/Partners'
+import FaqAccordion from '../components/FaqAccordion'
 import PageTitle from '../components/PageTitle'
 
 export default function Home() {
@@ -105,6 +109,9 @@ export default function Home() {
         </div>
       </section>
 
+      {/* PROCESS */}
+      <ProcessSteps />
+
       {/* FEATURED PROJECTS */}
       <section data-reveal className="mx-auto max-w-site px-[26px] pb-[90px]">
         <SectionHeader kicker={t.featuredKick} title={t.featuredTitle} />
@@ -112,6 +119,15 @@ export default function Home() {
           {featured.map((p) => <ProjectCard key={p.id} project={p} />)}
         </div>
       </section>
+
+      {/* TESTIMONIALS */}
+      <Testimonials />
+
+      {/* PARTNERS */}
+      <Partners />
+
+      {/* FAQ */}
+      <FaqAccordion />
 
       <CTASection />
     </div>

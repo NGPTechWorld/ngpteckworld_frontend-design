@@ -20,5 +20,8 @@ export const api = {
   getProjects: async (category) =>
     (await req(`/projects${category && category !== 'all' ? `?category=${category}` : ''}`)).data,
   getProject: async (slug) => (await req(`/projects/${slug}`)).data,
+  getTestimonials: async () => (await req('/testimonials')).data,
+  getPartners: async () => (await req('/partners')).data,
+  getFaqs: async () => (await req('/faqs')).data,
   postContact: (payload) => req('/contact', { method: 'POST', body: JSON.stringify(payload) }),
 }
