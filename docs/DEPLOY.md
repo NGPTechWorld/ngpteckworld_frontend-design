@@ -35,8 +35,12 @@ git checkout production && git merge --ff-only master && git push origin product
 PR. Vercel's own Git integration does the deploying — there are no deploy credentials in this
 repo.
 
-The dashboard project has an *Ignored Build Step* (`git diff --quiet HEAD^ HEAD -- .`) so a
-site-only change does not rebuild it. It fails open: if the command errors, the build runs.
+**Every push to `production` rebuilds and redeploys both projects**, even one that touched only
+the other app. That is deliberate. The obvious optimisation — an *Ignored Build Step* of
+`git diff --quiet HEAD^ HEAD -- .` on the dashboard — was tried and removed, because
+`HEAD^ HEAD` only compares the final commit of a push against its parent: push three commits
+where the dashboard changed in the first and not the last, and its build is skipped and the
+change never ships. Both builds take seconds, so there is nothing worth buying with that risk.
 
 ## Vercel project settings
 
