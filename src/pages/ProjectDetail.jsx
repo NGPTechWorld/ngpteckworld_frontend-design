@@ -7,6 +7,8 @@ import TeamCard from '../components/TeamCard'
 import Lightbox from '../components/Lightbox'
 import Icon from '../components/Icon'
 import { galleryBgs } from '../lib/visuals'
+import { toEmbedUrl } from '../lib/video'
+import { toHttpUrl } from '../lib/url'
 import PageTitle from '../components/PageTitle'
 
 export default function ProjectDetail() {
@@ -26,6 +28,8 @@ export default function ProjectDetail() {
     ? project.gallery.map((src, i) => ({ src, label: `${t.imgLabel} ${i + 1}`, bg: bgs[i % bgs.length] }))
     : [0, 1, 2, 3].map((i) => ({ src: null, label: `${t.imgLabel} ${i + 1}`, bg: bgs[i % bgs.length] }))
   const statusLabel = project.status === 'completed' ? t.statusCompleted : t.statusInProgress
+  const videoHref = toHttpUrl(project.video_url)
+  const embedUrl = toEmbedUrl(project.video_url)
 
   return (
     <div className="view-enter mx-auto max-w-narrow px-[26px] pb-[90px] pt-10">
@@ -64,25 +68,22 @@ export default function ProjectDetail() {
         </div>
       </div>
 
-      {/* VIDEO */}
-      <div className="mb-[46px]">
-        <h2 className="mb-[18px] text-[24px] font-bold">{t.dVideo}</h2>
-        {project.video_url ? (
-          <div className="overflow-hidden rounded-2xl border border-[var(--border)]" style={{ aspectRatio: '16/9' }}>
-            <iframe className="h-full w-full" src={project.video_url} title="project video" allowFullScreen />
-          </div>
-        ) : (
-          <div className="relative flex items-center justify-center overflow-hidden rounded-2xl border border-[var(--border)]" style={{ aspectRatio: '16/9', background: 'radial-gradient(circle at 50% 45%,#2A1A3C,#150B20)' }}>
-            <div className="absolute inset-0" style={{ background: 'repeating-linear-gradient(45deg,transparent 0 18px,rgba(255,255,255,.02) 18px 36px)' }} />
-            <div className="relative flex flex-col items-center gap-4">
-              <div className="flex h-[78px] w-[78px] items-center justify-center rounded-full" style={{ background: '#6B4E8E', boxShadow: '0 14px 36px -8px rgba(107,78,142,.7)' }}>
-                <Icon path='<path d="M8 5v14l11-7z"/>' size={30} fill="#fff" stroke="none" />
-              </div>
-              <span className="font-mono text-[12px] text-muted">{t.dVideoNote}</span>
+      {/* VIDEO — only shown when the project has a valid video link */}
+      {videoHref && (
+        <div className="mb-[46px]">
+          <h2 className="mb-[18px] text-[24px] font-bold">{t.dVideo}</h2>
+          {embedUrl ? (
+            <div className="overflow-hidden rounded-2xl border border-[var(--border)]" style={{ aspectRatio: '16/9' }}>
+              <iframe className="h-full w-full" src={embedUrl} title="project video" allowFullScreen />
             </div>
-          </div>
-        )}
-      </div>
+          ) : (
+            <a href={videoHref} target="_blank" rel="noreferrer"
+              className="glink inline-flex items-center gap-2.5 rounded-xl border border-white/[.14] bg-white/[.03] px-5 py-2.5 text-[14px] text-[#D8CEE6]">
+              {t.dVideoOpen}
+            </a>
+          )}
+        </div>
+      )}
 
       {/* TEAM */}
       <div className="mb-[46px]">
@@ -108,7 +109,7 @@ export default function ProjectDetail() {
         </div>
       )}
 
-      {lb !== null && <Lightbox bg={tiles[lb].bg} label={tiles[lb].label} onClose={() => setLb(null)} />}
+      {lb !== null && <Lightbox src={tiles[lb].src} bg={tiles[lb].bg} label={tiles[lb].label} onClose={() => setLb(null)} />}
     </div>
   )
 }

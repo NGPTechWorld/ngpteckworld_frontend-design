@@ -23,5 +23,7 @@ export const api = {
   getTestimonials: async () => (await req('/testimonials')).data,
   getPartners: async () => (await req('/partners')).data,
   getFaqs: async () => (await req('/faqs')).data,
+  getSettings: async () => (await req('/settings')).data,
+  getContent: async () => (await req('/content')).data,
   postContact: (payload) => req('/contact', { method: 'POST', body: JSON.stringify(payload) }),
 }

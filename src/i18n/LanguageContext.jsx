@@ -1,11 +1,15 @@
-import { createContext, useContext, useEffect, useState, useCallback } from 'react'
-import { ui } from './ui'
+import { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react'
+import { useContent } from '../lib/SiteContent'
+import { mergeContent } from '../lib/mergeContent'
 
 const LanguageContext = createContext(null)
 
 export function LanguageProvider({ children }) {
   const [lang, setLang] = useState('ar')
   const dir = lang === 'ar' ? 'rtl' : 'ltr'
+  // Built-in ui.js texts, overlaid with the dashboard-managed content when there is any.
+  const content = useContent()
+  const t = useMemo(() => mergeContent(lang, content), [lang, content])
 
   useEffect(() => {
     document.documentElement.lang = lang
@@ -15,7 +19,7 @@ export function LanguageProvider({ children }) {
   const toggle = useCallback(() => setLang((l) => (l === 'ar' ? 'en' : 'ar')), [])
   const pick = useCallback((obj, field) => obj?.[`${field}_${lang}`], [lang])
 
-  const value = { lang, dir, isAr: lang === 'ar', t: ui[lang], toggle, pick }
+  const value = { lang, dir, isAr: lang === 'ar', t, toggle, pick }
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>
 }
 

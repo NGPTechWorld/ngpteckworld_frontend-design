@@ -10,7 +10,8 @@ export default function Portfolio() {
   const { t } = useLang()
   const [projects, setProjects] = useState([])
   const [cat, setCat] = useState('all')
-  useEffect(() => { api.getProjects().then(setProjects).catch(() => {}) }, [])
+  const [failed, setFailed] = useState(false)
+  useEffect(() => { api.getProjects().then(setProjects).catch(() => setFailed(true)) }, [])
 
   const filtered = useMemo(
     () => (cat === 'all' ? projects : projects.filter((p) => p.category === cat)),
@@ -22,6 +23,7 @@ export default function Portfolio() {
       <PageTitle title={t.portfolioTitle} description={t.portfolioSub} />
       <SectionHeader as="h1" kicker={t.featuredKick} title={t.portfolioTitle} sub={t.portfolioSub} />
       <FilterPills active={cat} onSelect={setCat} />
+      {failed && <p role="status" className="py-10 text-center text-muted">{t.loadError}</p>}
       <div data-grid3 className="grid gap-[18px]" style={{ gridTemplateColumns: 'repeat(3,1fr)' }}>
         {filtered.map((p) => <ProjectCard key={p.id} project={p} />)}
       </div>

@@ -26,8 +26,8 @@ export default function About() {
       <div className="my-[46px]">
         <h2 className="mb-7 text-center text-[28px] font-bold">{t.valuesT}</h2>
         <div data-grid4 className="grid gap-4" style={{ gridTemplateColumns: 'repeat(4,1fr)' }}>
-          {t.values.map((v) => (
-            <div key={v.key} className="rounded-card border border-[var(--border)] bg-[var(--card-bg)] px-[18px] py-7 text-center">
+          {t.values.map((v, i) => (
+            <div key={i} className="rounded-card border border-[var(--border)] bg-[var(--card-bg)] px-[18px] py-7 text-center">
               <div className="mx-auto mb-3.5 flex h-[46px] w-[46px] items-center justify-center rounded-xl text-white" style={{ background: 'linear-gradient(135deg,#6B4E8E,#9678BE)' }}>
                 <Icon path={iconPaths[v.key]} size={22} stroke="#fff" />
               </div>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../lib/api'
+import { pickFeatured } from '../lib/projects'
 import { useLang } from '../i18n/LanguageContext'
 import Button from '../components/Button'
 import SectionHeader from '../components/SectionHeader'
@@ -22,7 +23,7 @@ export default function Home() {
   useEffect(() => {
     api.getStats().then(setStats).catch(() => {})
     api.getServices().then((s) => setServices(s.slice(0, 3))).catch(() => {})
-    api.getProjects().then((p) => setFeatured(p.slice(0, 3))).catch(() => {})
+    api.getProjects().then((p) => setFeatured(pickFeatured(p))).catch(() => {})
   }, [])
 
   // Prefer dashboard-managed stats; fall back to the static dictionary.

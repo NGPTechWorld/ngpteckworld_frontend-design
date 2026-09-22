@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom'
 import { useLang } from '../i18n/LanguageContext'
+import { useSiteSettings } from '../lib/SiteSettings'
 
 export default function Footer() {
   const { t } = useLang()
+  const settings = useSiteSettings()
   return (
     <footer className="mt-5 border-t border-[var(--border)]" style={{ background: 'rgba(0,0,0,.22)' }}>
       <div data-grid3 className="mx-auto grid max-w-site gap-[30px] px-[26px] pb-[30px] pt-[46px]" style={{ gridTemplateColumns: '1.4fr 1fr 1fr' }}>
@@ -22,8 +24,8 @@ export default function Footer() {
         <div>
           <div className="mb-3.5 text-[15px] font-semibold">{t.navContact}</div>
           <div className="flex flex-col gap-2.5 text-[14px] text-muted">
-            <span dir="ltr">info@ngptechworld.com</span>
-            <span dir="ltr">+963 933 069 105 </span>
+            {settings.email && <span dir="ltr">{settings.email}</span>}
+            {settings.phone && <span dir="ltr">{settings.phone}</span>}
           </div>
         </div>
       </div>

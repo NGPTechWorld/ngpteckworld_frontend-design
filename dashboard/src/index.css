@@ -1,0 +1,27 @@
+@import './styles/tokens.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html { color-scheme: dark; }
+body {
+  background: var(--bg-deep);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+[dir='rtl'] { font-family: 'Cairo', sans-serif; }
+[dir='ltr'] { font-family: 'Poppins', 'Cairo', sans-serif; }
+::selection { background: #6B4E8E; color: #fff; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #1A0F26; }
+::-webkit-scrollbar-thumb { background: #3a2a55; border-radius: 8px; }
+a { text-decoration: none; color: inherit; }
+
+@layer components {
+  .bg-page { background: var(--page-bg); background-attachment: fixed; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}

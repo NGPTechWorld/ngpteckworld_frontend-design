@@ -2,6 +2,8 @@ import React, { lazy } from 'react'
 import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { LanguageProvider } from './i18n/LanguageContext'
+import { ContentProvider } from './lib/SiteContent'
+import { SiteSettingsProvider } from './lib/SiteSettings'
 import App from './App'
 import './index.css'
 
@@ -28,8 +30,12 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('app')).render(
   <React.StrictMode>
-    <LanguageProvider>
-      <RouterProvider router={router} />
-    </LanguageProvider>
+    <ContentProvider>
+      <LanguageProvider>
+        <SiteSettingsProvider>
+          <RouterProvider router={router} />
+        </SiteSettingsProvider>
+      </LanguageProvider>
+    </ContentProvider>
   </React.StrictMode>,
 )
