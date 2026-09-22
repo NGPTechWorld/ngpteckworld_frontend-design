@@ -1,94 +1,93 @@
 # Deployment guide
 
-Three pieces: **backend** (Laravel, serv00), **public site** (this repo, Vercel), **dashboard**
-(`dashboard/` — its own Vite project inside this repo, its own Vercel project, proxied to `/admin`
-on the site's own domain). Deploy in this order: backend → dashboard → site (the site's rewrite
-needs the dashboard's URL, so the dashboard must exist first).
+Three pieces, all live:
+
+| Piece | Where | URL |
+|---|---|---|
+| **Public site** (this repo's root) | Vercel project `ngp-site` | https://ngptechworld.com |
+| **Dashboard** (`dashboard/`) | Vercel project `ngp-dashboard` | https://ngptechworld.com/admin |
+| **Backend** (`ngp-backend`) | Docker on `91.99.224.132` | https://api.ngptechworld.com |
+
+The backend has its own runbook in that repo's `docs/DEPLOY.md`.
 
 ## Why one repo, two Vercel projects
 
 The dashboard is a separate Vite app (own `package.json`, build, tests) so a dashboard bug can
 never break a site deploy or vice versa — but it must **not** feel like a separate product. Vercel
 lets several projects share one repository via each project's own *Root Directory*, and one
-project's `vercel.json` can transparently proxy paths to another project's URL. The result: one
-`git push` updates both (if both changed), one visible domain, `/admin` just works.
+project's `vercel.json` transparently proxies `/admin` to the other project's URL. The result: one
+`git push` updates both, one visible domain, `/admin` just works.
 
-## 0. Before anything else
+Because the dashboard is proxied rather than given its own subdomain, the browser origin for both
+apps is `https://ngptechworld.com`. That is why the backend's `FRONTEND_URL` and `DASHBOARD_URL`
+hold the same value.
 
-* **Rotate the serv00 database password.** An earlier `.env.example` in the backend repo
-  contained it; it is still in that repo's git history even though the file is clean now. Change
-  it in the serv00 panel and update the server's own `.env`.
-* Nothing is committed yet anywhere. Review with `git status` / `git diff` in `ngp-backend` and
-  in this repo (which now also contains `dashboard/`), then commit.
+## Shipping a change
 
-## 1. Backend on serv00
+Both projects deploy from the **`production`** branch. `master` is the integration branch;
+pushing there produces preview deployments, not production ones.
 
-1. Upload/pull the code, then `composer install --no-dev --optimize-autoloader`
-   (openspout in `composer.lock` supports PHP ≤ 8.4 only; it is unused — add
-   `--ignore-platform-req=php` if the host runs 8.5).
-2. Server `.env` (never commit it):
-   ```
-   APP_ENV=production
-   APP_DEBUG=false
-   APP_URL=https://<backend-domain>
-   DB_*=<serv00 credentials>
-   FRONTEND_URL=https://<your-site-domain>
-   DASHBOARD_URL=https://<your-site-domain>       # same origin as the site — see step 3
-   CORS_ALLOWED_ORIGINS_PATTERNS=                 # empty: do not trust every *.vercel.app
-   SANCTUM_EXPIRATION=10080                       # 7-day dashboard sessions (default is 30 days)
-   CONTACT_MAIL_ENABLED=true + MAIL_* (SMTP)      # only if you want an email per contact request
-   ```
-3. First deploy only: add `ADMIN_PASSWORD=<strong password>` (≥ 8 chars) to `.env`, run
-   `php artisan migrate --force` then `php artisan db:seed --force`, then **remove**
-   `ADMIN_PASSWORD` from `.env`. Later deploys: `php artisan migrate --force` only (never the full
-   `db:seed` again; use `--class=`). Migrations create `site_settings`, `admin_notes` on
-   `contacts`, `site_contents` and `content_items` with their defaults — no manual seeding needed
-   for them.
-4. `php artisan config:clear && php artisan route:clear && php artisan view:clear`.
-5. Docroot = the app's `public/` folder. Create the media link:
-   `cd public && ln -s ../storage/app/public media`.
-6. Cron (every minute): `php /path/to/artisan schedule:run` — prunes expired API tokens daily.
-7. PHP settings: `fileinfo` enabled, `upload_max_filesize=6M`, `post_max_size=8M`,
-   `display_errors=Off`, `expose_php=Off`.
-8. Verify: `curl https://<backend>/api/admin/nope` → JSON `{"message":"Not found."}`, no stack
-   trace. `curl -I https://<backend>/media/x.php` → 403. `curl https://<backend>/api/content` →
-   JSON. If the host sits behind a proxy, confirm `$request->ip()` is the visitor's real IP
-   (otherwise all visitors share the login rate limiter) — configure trusted proxies in
-   `bootstrap/app.php` if not.
+```bash
+git checkout production && git merge --ff-only master && git push origin production
+```
 
-## 2. Dashboard — new Vercel project, Root Directory `dashboard`
+`.github/workflows/ci.yml` runs the tests and a production build for both apps on every push and
+PR. Vercel's own Git integration does the deploying — there are no deploy credentials in this
+repo.
 
-1. In Vercel, **Add New Project**, import this same GitHub repository again (a repo can back
-   several projects) and set **Root Directory** to `dashboard`.
-2. Framework preset **Vite**, build `npm run build`, output `dist`.
-3. Env var: `VITE_API_BASE_URL = https://<backend-domain>/api`.
-4. Deploy it and note its URL, e.g. `ngp-dashboard-xyz.vercel.app`.
-5. Open it directly (that raw URL) once — `https://ngp-dashboard-xyz.vercel.app/admin/login` should
-   load the sign-in page. That confirms `base: '/admin/'` + its own `vercel.json` are wired
-   correctly, independent of the site's proxy (step 3).
+The dashboard project has an *Ignored Build Step* (`git diff --quiet HEAD^ HEAD -- .`) so a
+site-only change does not rebuild it. It fails open: if the command errors, the build runs.
 
-## 3. Public site (this repo's root) on Vercel
+## Vercel project settings
 
-1. Root Directory: repo root (unchanged from before). Env vars unchanged.
-2. Edit **this repo's** `vercel.json` (repo root, not `dashboard/vercel.json`): replace
-   `REPLACE-WITH-DASHBOARD-VERCEL-DOMAIN` in both places with the exact host from step 2.4
-   (no `https://` twice, no trailing slash) — e.g.
-   `"destination": "https://ngp-dashboard-xyz.vercel.app/admin/:path*"`.
-3. Commit and push (or redeploy). Once live, `https://<your-site-domain>/admin` shows the
-   dashboard's login page — check the browser address bar still reads your site's own domain.
-4. If you later attach a custom domain to the dashboard project too, you can update the rewrite
-   to point at that domain instead; nothing else changes.
+Set once; recorded here because they live in Vercel's UI rather than in this repo.
 
-## 4. Filament panel (`/admin` on the *backend*, unrelated to the dashboard's own `/admin` path)
+| | `ngp-site` | `ngp-dashboard` |
+|---|---|---|
+| Root Directory | `.` | `dashboard` |
+| Framework | Vite | Vite |
+| Production Branch | `production` | `production` |
+| `VITE_API_BASE_URL` | `https://api.ngptechworld.com/api` | same |
+| Domains | `ngptechworld.com`, `www.ngptechworld.com` | `ngp-dashboard.vercel.app` |
 
-The React dashboard covers every section of the old panel. Retire Filament once you are happy
-with the new one: remove its provider from `bootstrap/providers.php` (or restrict it by IP).
-Reason: Filament stores uploaded files with the extension the browser sent, which the new API
-does not (the backend's `.htaccess` rule only mitigates it on Apache).
+`vercel.json` at the repo root rewrites `/admin/:path*` to `https://ngp-dashboard.vercel.app`.
+That is the dashboard's **stable alias**, not a deployment URL — a deployment URL changes on every
+deploy and the rewrite would break the next time the dashboard shipped.
 
-## 5. After going live
+If the dashboard ever gets its own custom domain, update that rewrite; nothing else changes.
 
-* Sign in at `https://<your-site-domain>/admin`, fill **Site settings** (phone + social links)
-  and review **Page content**.
-* Upload real project images/team photos; add testimonials, partners and FAQs.
-* Change the admin password regularly; create one account per person under **Users**.
+## DNS
+
+Managed at Hetzner (`ns1.your-server.de`, `ns.second-ns.com`, `ns3.second-ns.de`).
+
+| Record | Type | Value |
+|---|---|---|
+| `ngptechworld.com` | A | `216.150.1.1` and `216.150.16.1` |
+| `www` | CNAME | `b09cb6e54c7b5550.vercel-dns-016.com.` |
+| `api` | A | `91.99.224.132` |
+| `api` | AAAA | `2a01:4f8:c2c:5c53::1` |
+
+Leave the `MX` records alone — changing `A` does not affect email, but replacing the whole zone
+would.
+
+## Where the content comes from
+
+Everything is managed from the dashboard: services, projects, stats, testimonials, partners, FAQ,
+the contact details and social links (**Site settings**), and the page texts (**Page content**).
+If the API is unreachable the site still renders, using the fallback text in `src/i18n/ui.js` and
+`src/lib/SiteSettings.jsx`.
+
+## After going live
+
+* Sign in at https://ngptechworld.com/admin and **change the seeded admin password**.
+* Fill **Site settings** (phone, social links) and review **Page content**.
+* Upload real project images and team photos; add testimonials, partners and FAQs.
+* Create one account per person under **Users** rather than sharing the first admin.
+
+## Filament
+
+The backend still exposes its old Filament panel at `https://api.ngptechworld.com/admin` — a
+different thing from this dashboard's `/admin`, on a different domain. The React dashboard covers
+every section of it. Retiring it is worth doing: Filament stores uploaded files with the extension
+the browser supplied, which the new API does not. Remove its provider from
+`bootstrap/providers.php` in the backend repo when you are confident in the new panel.
