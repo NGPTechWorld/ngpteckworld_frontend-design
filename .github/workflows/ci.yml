@@ -1,0 +1,64 @@
+# Tests and builds for both apps in this repo: the public site at the root and the admin
+# dashboard in `dashboard/`, which is a separate Vite project with its own package.json, tests
+# and Vercel project.
+#
+# Deployment is NOT here — Vercel's own Git integration deploys both projects, with their
+# Production Branch set to `production`. This workflow exists so a broken build is visible on the
+# PR rather than only after Vercel has already tried to ship it.
+
+name: ci
+
+on:
+  push:
+    branches: [master, production]
+  pull_request:
+    branches: [master, production]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      # The two apps ship independently; if one breaks, the other's result is still worth having.
+      fail-fast: false
+      matrix:
+        include:
+          - name: site
+            dir: .
+          - name: dashboard
+            dir: dashboard
+
+    defaults:
+      run:
+        working-directory: ${{ matrix.dir }}
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: ${{ matrix.dir }}/package-lock.json
+
+      - name: Install dependencies
+        # `ci`, not `install`: it installs exactly what the lockfile pins and fails if
+        # package.json and the lockfile have drifted — which is what Vercel will do too.
+        run: npm ci
+
+      - name: Run the tests
+        run: npm test
+
+      - name: Build
+        # Catches what the tests cannot: a broken import, a Tailwind or PostCSS misconfiguration,
+        # anything that only surfaces when Vite actually bundles.
+        run: npm run build
