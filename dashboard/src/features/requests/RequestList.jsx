@@ -21,7 +21,7 @@ export default function RequestList() {
   const confirm = useConfirm()
   const toast = useToast()
   const navigate = useNavigate()
-  const { dir } = useLanguage()
+  const { dir, pickField } = useLanguage()
 
   const list = useListParams(DEFAULTS)
   // an unknown ?status= in the URL behaves like "All" (the tab bar and the request agree)
@@ -93,11 +93,21 @@ export default function RequestList() {
             </Link>
             <p className="text-xs text-muted">
               <span dir="auto" className="inline-block max-w-full truncate align-bottom">
-                {row.message}
+                {row.title}
               </span>
             </p>
           </div>
         </div>
+      ),
+    },
+    {
+      key: 'service',
+      header: t.service,
+      hideBelow: 'lg',
+      cell: (row) => (
+        <span className="inline-block max-w-[10rem] truncate align-bottom text-muted">
+          {row.service ? pickField(row.service, 'title') : '—'}
+        </span>
       ),
     },
     {

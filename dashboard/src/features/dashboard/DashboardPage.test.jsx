@@ -70,7 +70,7 @@ describe('DashboardPage', () => {
 
     const sara = await screen.findByRole('link', { name: /Sara Ahmad/ })
     expect(sara).toHaveAttribute('href', '/requests/5')
-    expect(within(sara).getByText('I would like a quote for a mobile app.')).toBeInTheDocument()
+    expect(within(sara).getByText('Mobile app quote')).toBeInTheDocument()
     expect(within(sara).getByText('New')).toBeInTheDocument()
     expect(within(sara).getByText('5 minutes ago')).toBeInTheDocument()
 

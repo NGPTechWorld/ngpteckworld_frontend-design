@@ -1,43 +1,108 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { api } from '../lib/api'
 import { useLang } from '../i18n/LanguageContext'
 import { useSiteSettings, SOCIAL_KEYS } from '../lib/SiteSettings'
 import { toHttpUrl } from '../lib/url'
 import Icon from '../components/Icon'
 import PageTitle from '../components/PageTitle'
+import Select from '../components/Select'
 
-const inputCls = 'rounded-[11px] border border-white/[.14] px-4 py-3.5 text-[14.5px] text-white outline-none'
+// w-full: each field is now wrapped in its own <div> (to hold the error text below it), so the <input>/
+// <textarea> is no longer a direct flex child of the form and loses the free full-width stretch that came
+// from the form's `align-items: stretch` — it must be told to fill its wrapper explicitly instead.
+const inputCls = 'w-full rounded-[11px] border border-white/[.14] px-4 py-3.5 text-[14.5px] text-white outline-none'
 const inputStyle = { background: 'rgba(26,15,38,.6)' }
+const EMPTY_FORM = { service_id: '', name: '', phone: '', email: '', title: '', description: '' }
+const COOLDOWN_SECONDS = 60
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const PHONE_RE = /^[+\d][\d\s().-]*$/
+const phoneDigitCount = (v) => (v.match(/\d/g) || []).length
+
+function validate(form, t) {
+  const errors = {}
+  if (!form.service_id) errors.service_id = t.errRequired
+  if (!form.name.trim()) errors.name = t.errRequired
+  if (!form.phone.trim()) errors.phone = t.errRequired
+  else if (!PHONE_RE.test(form.phone.trim()) || phoneDigitCount(form.phone) < 7) errors.phone = t.errPhoneInvalid
+  if (!form.email.trim()) errors.email = t.errRequired
+  else if (!EMAIL_RE.test(form.email.trim())) errors.email = t.errEmailInvalid
+  if (!form.title.trim()) errors.title = t.errRequired
+  if (!form.description.trim()) errors.description = t.errRequired
+  else if (form.description.trim().length < 5) errors.description = t.errDescriptionShort
+  return errors
+}
+
+function FieldError({ id, text }) {
+  if (!text) return null
+  return (
+    <p id={id} className="mt-1.5 text-[12.5px]" style={{ color: '#F3B4B4' }}>
+      {text}
+    </p>
+  )
+}
 
 export default function Contact() {
-  const { t } = useLang()
+  const { t, pick } = useLang()
   const settings = useSiteSettings()
-  const [form, setForm] = useState({ name: '', phone: '', email: '', message: '' })
+  const [services, setServices] = useState([])
+  const [form, setForm] = useState(EMPTY_FORM)
+  const [fieldErrors, setFieldErrors] = useState({})
   const [sent, setSent] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [cooldown, setCooldown] = useState(0)
+
+  useEffect(() => { api.getServices().then(setServices).catch(() => setServices([])) }, [])
+
+  // Ticks the post-send cooldown down to 0, one second at a time.
+  useEffect(() => {
+    if (cooldown <= 0) return undefined
+    const id = setTimeout(() => setCooldown((s) => s - 1), 1000)
+    return () => clearTimeout(id)
+  }, [cooldown])
 
   // Only social links that were filled in from the dashboard are shown.
   const socials = SOCIAL_KEYS
     .map((key) => ({ key, label: t.socialMeta[key], url: toHttpUrl(settings[key]) }))
     .filter((s) => s.url)
 
-  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
+  // Accepts either a DOM change event (native inputs) or a raw value (the custom Select), so every
+  // field can share one setter.
+  const set = (k) => (eOrValue) => {
+    const value = eOrValue && typeof eOrValue === 'object' && 'target' in eOrValue ? eOrValue.target.value : eOrValue
+    setForm((f) => ({ ...f, [k]: value }))
+    setFieldErrors((errs) => (errs[k] ? { ...errs, [k]: undefined } : errs))
+  }
 
   const onSubmit = async (e) => {
     e.preventDefault()
-    setBusy(true)
+    if (busy || cooldown > 0) return
     setError('')
+    const errors = validate(form, t)
+    setFieldErrors(errors)
+    if (Object.keys(errors).length > 0) return
+
+    setBusy(true)
     try {
       await api.postContact(form)
       setSent(true)
-      setForm({ name: '', phone: '', email: '', message: '' })
+      setForm(EMPTY_FORM)
+      setCooldown(COOLDOWN_SECONDS)
       setTimeout(() => setSent(false), 2600)
     } catch (err) {
-      // Keep what the visitor typed and tell them what went wrong.
-      setError(err.status === 422 ? t.errValidation : err.status === 429 ? t.errThrottle : t.errGeneric)
+      if (err.status === 422 && err.body?.errors) {
+        // Server-side field errors (e.g. a service id that no longer exists) land under the same fields.
+        const mapped = {}
+        for (const [field, msgs] of Object.entries(err.body.errors)) mapped[field] = Array.isArray(msgs) ? msgs[0] : String(msgs)
+        setFieldErrors(mapped)
+      } else {
+        setError(err.status === 422 ? t.errValidation : err.status === 429 ? t.errThrottle : t.errGeneric)
+      }
     } finally { setBusy(false) }
   }
+
+  const buttonLabel = busy ? t.sending : sent ? t.sent : cooldown > 0 ? t.cooldownWait(cooldown) : t.submit
 
   return (
     <div className="view-enter mx-auto max-w-[1100px] px-[26px] pb-[90px] pt-[70px]">
@@ -78,21 +143,102 @@ export default function Contact() {
           )}
         </div>
 
-        <form onSubmit={onSubmit} className="flex flex-col gap-3.5 rounded-card border border-[var(--border)] bg-[var(--card-bg)] p-[30px]">
-          <div data-grid2 className="grid gap-3.5" style={{ gridTemplateColumns: '1fr 1fr' }}>
-            <input required placeholder={t.fName} value={form.name} onChange={set('name')} className={inputCls} style={inputStyle} />
-            <input required placeholder={t.fPhone} value={form.phone} onChange={set('phone')} dir="ltr" className={inputCls} style={{ ...inputStyle, textAlign: 'start' }} />
+        <form onSubmit={onSubmit} noValidate className="flex flex-col gap-3.5 rounded-card border border-[var(--border)] bg-[var(--card-bg)] p-[30px]">
+          <div>
+            <Select
+              id="service-select"
+              ariaLabel={t.fService}
+              placeholder={t.fService}
+              invalid={Boolean(fieldErrors.service_id)}
+              describedBy={fieldErrors.service_id ? 'service-error' : undefined}
+              value={form.service_id}
+              onChange={set('service_id')}
+              options={services.map((s) => ({ value: String(s.id), label: pick(s, 'title') }))}
+              className={inputCls}
+              style={inputStyle}
+            />
+            <FieldError id="service-error" text={fieldErrors.service_id} />
           </div>
-          <input required type="email" placeholder={t.fEmail} value={form.email} onChange={set('email')} dir="ltr" className={inputCls} style={{ ...inputStyle, textAlign: 'start' }} />
-          <textarea required rows={5} placeholder={t.fMsg} value={form.message} onChange={set('message')} className={`${inputCls} resize-y`} style={inputStyle} />
+
+          <div data-grid2 className="grid gap-3.5" style={{ gridTemplateColumns: '1fr 1fr' }}>
+            <div>
+              <input
+                placeholder={t.fName}
+                value={form.name}
+                onChange={set('name')}
+                aria-invalid={fieldErrors.name ? 'true' : undefined}
+                aria-describedby={fieldErrors.name ? 'name-error' : undefined}
+                className={inputCls}
+                style={inputStyle}
+              />
+              <FieldError id="name-error" text={fieldErrors.name} />
+            </div>
+            <div>
+              <input
+                placeholder={t.fPhone}
+                value={form.phone}
+                onChange={set('phone')}
+                dir="ltr"
+                inputMode="tel"
+                aria-invalid={fieldErrors.phone ? 'true' : undefined}
+                aria-describedby={fieldErrors.phone ? 'phone-error' : undefined}
+                className={inputCls}
+                style={{ ...inputStyle, textAlign: 'start' }}
+              />
+              <FieldError id="phone-error" text={fieldErrors.phone} />
+            </div>
+          </div>
+
+          <div>
+            <input
+              type="email"
+              placeholder={t.fEmail}
+              value={form.email}
+              onChange={set('email')}
+              dir="ltr"
+              aria-invalid={fieldErrors.email ? 'true' : undefined}
+              aria-describedby={fieldErrors.email ? 'email-error' : undefined}
+              className={inputCls}
+              style={{ ...inputStyle, textAlign: 'start' }}
+            />
+            <FieldError id="email-error" text={fieldErrors.email} />
+          </div>
+
+          <div>
+            <input
+              placeholder={t.fTitle}
+              value={form.title}
+              onChange={set('title')}
+              aria-invalid={fieldErrors.title ? 'true' : undefined}
+              aria-describedby={fieldErrors.title ? 'title-error' : undefined}
+              className={inputCls}
+              style={inputStyle}
+            />
+            <FieldError id="title-error" text={fieldErrors.title} />
+          </div>
+
+          <div>
+            <textarea
+              rows={5}
+              placeholder={t.fDescription}
+              value={form.description}
+              onChange={set('description')}
+              aria-invalid={fieldErrors.description ? 'true' : undefined}
+              aria-describedby={fieldErrors.description ? 'description-error' : undefined}
+              className={`${inputCls} resize-y`}
+              style={inputStyle}
+            />
+            <FieldError id="description-error" text={fieldErrors.description} />
+          </div>
+
           {error && (
             <div role="alert" className="rounded-[11px] px-4 py-3 text-[14px]"
               style={{ background: 'rgba(220,80,80,.12)', border: '1px solid rgba(220,80,80,.4)', color: '#F3B4B4' }}>
               {error}
             </div>
           )}
-          <button type="submit" disabled={busy} className="btn-p rounded-[11px] border-none bg-accent py-[15px] text-[15px] font-semibold text-white">
-            {sent ? t.sent : t.submit}
+          <button type="submit" disabled={busy || cooldown > 0} className="btn-p rounded-[11px] border-none bg-accent py-[15px] text-[15px] font-semibold text-white">
+            {buttonLabel}
           </button>
         </form>
       </div>

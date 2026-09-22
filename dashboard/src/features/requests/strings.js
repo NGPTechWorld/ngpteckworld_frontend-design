@@ -12,6 +12,7 @@ export default {
     from: 'من تاريخ',
     to: 'إلى تاريخ',
 
+    service: 'الخدمة المطلوبة',
     name: 'الاسم',
     email: 'البريد الإلكتروني',
     phone: 'الهاتف',
@@ -53,6 +54,7 @@ export default {
     from: 'From',
     to: 'To',
 
+    service: 'Requested service',
     name: 'Name',
     email: 'Email',
     phone: 'Phone',

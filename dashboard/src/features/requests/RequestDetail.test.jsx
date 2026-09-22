@@ -11,7 +11,9 @@ const request = makeRequest(7, {
   name: 'Sara Ahmad',
   email: 'sara@example.com',
   phone: '+963 933 000 111',
-  message: 'Hello,\nI would like a quote for a mobile app.',
+  service: { id: 2, title_ar: 'تطبيقات الجوال', title_en: 'Mobile apps' },
+  title: 'Mobile app quote',
+  description: 'Hello,\nI would like a quote for a mobile app.',
   status: 'new',
   admin_notes: 'Call back on Sunday.',
   created_at: '2026-09-05T10:00:00.000000Z',
@@ -43,6 +45,8 @@ describe('RequestDetail', () => {
     renderWithProviders(<RequestDetail />, { route, path })
 
     expect(await screen.findByRole('heading', { level: 1, name: 'Sara Ahmad' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Mobile app quote' })).toBeInTheDocument()
+    expect(screen.getByText('Mobile apps')).toBeInTheDocument()
     expect(screen.getByText(/I would like a quote for a mobile app\./)).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Status' })).toHaveValue('new')
     expect(notes()).toHaveValue('Call back on Sunday.')

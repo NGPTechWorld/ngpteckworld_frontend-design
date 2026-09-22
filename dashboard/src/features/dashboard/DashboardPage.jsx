@@ -190,7 +190,7 @@ export default function DashboardPage() {
                       </p>
                       <p className="truncate text-xs text-muted">
                         <span dir="auto" className="inline-block max-w-full truncate align-bottom">
-                          {request.message}
+                          {request.title}
                         </span>
                       </p>
                     </div>

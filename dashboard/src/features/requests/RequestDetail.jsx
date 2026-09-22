@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Mail, Phone, SearchX, Trash2 } from 'lucide-react'
-import { useCommon, useFormat, useStrings } from '@/i18n'
+import { useCommon, useFormat, useLanguage, useStrings } from '@/i18n'
 import { errorText } from '@/lib/errors'
 import { Alert, Button, Card, EmptyState, Field, PageHeader, PageSpinner, Select, StatusBadge, useConfirm } from '@/ui'
 import { NotesForm } from './NotesForm'
@@ -25,6 +25,7 @@ export default function RequestDetail() {
   const t = useStrings(strings)
   const c = useCommon()
   const f = useFormat()
+  const { pickField } = useLanguage()
   const confirm = useConfirm()
   const navigate = useNavigate()
 
@@ -89,9 +90,9 @@ export default function RequestDetail() {
 
       <div className="grid gap-5 lg:grid-cols-3">
         <div className="min-w-0 space-y-5 lg:col-span-2">
-          <Card title={t.messageTitle}>
+          <Card title={request.title || t.messageTitle}>
             <p dir="auto" className="whitespace-pre-wrap break-words text-[15px] leading-relaxed text-ink">
-              {request.message}
+              {request.description}
             </p>
           </Card>
           <NotesForm key={request.id} request={request} />
@@ -106,6 +107,9 @@ export default function RequestDetail() {
           </Field>
 
           <dl className="divide-y divide-white/[.06] border-t border-white/[.07] pt-4">
+            <Row label={t.service}>
+              {request.service ? <span>{pickField(request.service, 'title')}</span> : <span className="text-faint">{t.notProvided}</span>}
+            </Row>
             <Row label={t.name}>
               <span dir="auto">{request.name}</span>
             </Row>

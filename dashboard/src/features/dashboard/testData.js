@@ -25,10 +25,12 @@ export const counts = {
 
 export const makeRequest = (id, over = {}) => ({
   id,
+  service: { id: 1, title_ar: 'تصميم مواقع', title_en: 'Web design' },
+  title: `Request ${id}`,
   name: `Client ${id}`,
   email: `client${id}@example.com`,
   phone: '+963 933 000 111',
-  message: `Message number ${id} about a new project.`,
+  description: `Message number ${id} about a new project.`,
   status: 'new',
   admin_notes: null,
   created_at: minutesAgo(id * 10),
@@ -41,7 +43,7 @@ export function makeDashboard(over = {}) {
     data: {
       counts,
       recent_requests: [
-        makeRequest(5, { name: 'Sara Ahmad', message: 'I would like a quote for a mobile app.', created_at: minutesAgo(5) }),
+        makeRequest(5, { name: 'Sara Ahmad', title: 'Mobile app quote', description: 'I would like a quote for a mobile app.', created_at: minutesAgo(5) }),
         makeRequest(4, { name: 'Omar Khaled', status: 'in_progress', created_at: minutesAgo(180) }),
         makeRequest(3, { name: 'Layla Hassan', status: 'done', created_at: minutesAgo(60 * 30) }),
       ],

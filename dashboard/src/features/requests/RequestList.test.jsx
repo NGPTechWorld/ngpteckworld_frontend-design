@@ -146,9 +146,9 @@ describe('RequestList', () => {
 
       await user.click(screen.getByRole('button', { name: /^Received/ }))
       await waitFor(() => expect(lastList(server)).toMatchObject({ sort: 'created_at', dir: 'asc' }))
-      // the message is only a preview under the name: there is no column (and no server sort) for it
-      expect(screen.queryByRole('columnheader', { name: /^Message/ })).not.toBeInTheDocument()
-      expect(within(screen.getByText('Sara Ahmad').closest('tr')).getByText(rows[0].message)).toBeInTheDocument()
+      // the title is only a preview under the name: there is no column (and no server sort) for it
+      expect(screen.queryByRole('columnheader', { name: /^Title/ })).not.toBeInTheDocument()
+      expect(within(screen.getByText('Sara Ahmad').closest('tr')).getByText(rows[0].title)).toBeInTheDocument()
     })
 
     it('paginates', async () => {
