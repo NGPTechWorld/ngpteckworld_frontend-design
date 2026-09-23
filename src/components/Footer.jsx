@@ -18,6 +18,7 @@ export default function Footer() {
             <Link to="/" className="hover:text-white">{t.navHome}</Link>
             <Link to="/services" className="hover:text-white">{t.navServices}</Link>
             <Link to="/portfolio" className="hover:text-white">{t.navPortfolio}</Link>
+            <Link to="/team" className="hover:text-white">{t.navTeam}</Link>
             <Link to="/about" className="hover:text-white">{t.navAbout}</Link>
           </div>
         </div>
