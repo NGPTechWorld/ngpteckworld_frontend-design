@@ -14,7 +14,7 @@ import Testimonials from '../components/Testimonials'
 import Partners from '../components/Partners'
 import FaqAccordion from '../components/FaqAccordion'
 import PageTitle from '../components/PageTitle'
-import TechGlobe from '../components/fx/TechGlobe'
+import LogoNova from '../components/fx/LogoNova'
 import CountUp from '../components/fx/CountUp'
 import Skeleton, { SkeletonGrid } from '../components/fx/Skeleton'
 
@@ -64,11 +64,7 @@ export default function Home() {
     <div className="view-enter">
       <PageTitle title={t.navHome} description={t.heroSub} />
 
-      {/* ================= HERO =================
-          The globe is absolutely positioned and bleeds off the top-right (top-left in RTL) rather
-          than sitting in its own grid column. A column would force the copy to shrink on every
-          breakpoint to keep it company; letting it overlap means the text keeps a comfortable
-          measure and the globe simply crops. */}
+      {/* ================= HERO ================= */}
       <section data-hero className="relative overflow-hidden">
         <div className="relative z-[1] mx-auto max-w-site px-[26px] pb-[clamp(36px,5vw,64px)] pt-[clamp(20px,4vw,104px)]">
           <div className="max-w-[660px]">
@@ -99,64 +95,13 @@ export default function Home() {
 
         </div>
 
-        {/* Placed after the copy in the DOM on purpose. On a phone .ngp-hero-globe is in normal
-            flow, so this is what puts it *below* the headline rather than above it. From the lg
-            breakpoint up the same element is position:absolute and bleeds off the outer edge,
-            where source order has no bearing on where it lands — the copy stays on top via
-            z-index, not ordering. */}
-        <div className="ngp-hero-globe ngp-globe-in pointer-events-none z-0">
-          {/* The mask lives on this inner wrapper, not the outer one, so it fades the globe's
-              bottom edge without also fading the mark sitting on top of it. */}
-          <div
-            className="absolute inset-0"
-            style={{
-              WebkitMaskImage: 'linear-gradient(to bottom, #000 58%, transparent 94%)',
-              maskImage: 'linear-gradient(to bottom, #000 58%, transparent 94%)',
-            }}
-          >
-            <TechGlobe className="h-full w-full" />
-          </div>
-
-          {/* The mark, centred on the globe. Its own glow disc separates it from the dot field
-              underneath — without it the logo's strokes and the continents read as one texture. */}
-          <div className="absolute inset-0 grid place-items-center">
-            <div className="relative grid place-items-center" style={{ width: '54%', height: '54%' }}>
-              <div
-                className="absolute inset-0 rounded-full"
-                style={{
-                  background: 'radial-gradient(circle, rgba(20,11,30,.95) 30%, rgba(20,11,30,.6) 52%, transparent 74%)',
-                }}
-              />
-              <div
-                className="absolute rounded-full border border-dashed"
-                style={{
-                  inset: '-14%',
-                  borderColor: 'rgba(197,178,224,.32)',
-                  animation: 'ngpRot 48s linear infinite',
-                }}
-              />
-              <div
-                className="absolute rounded-full border"
-                style={{
-                  inset: '4%',
-                  borderColor: 'rgba(150,120,190,.22)',
-                  animation: 'ngpRot 34s linear infinite reverse',
-                  borderStyle: 'dotted',
-                }}
-              />
-              <img
-                src="/assets/ngp-mark-white.png"
-                alt=""
-                width="512"
-                height="512"
-                className="relative h-auto w-[46%]"
-                style={{
-                  animation: 'ngpFloat 7s ease-in-out infinite',
-                  filter: 'drop-shadow(0 0 14px rgba(150,120,190,.38)) drop-shadow(0 0 34px rgba(107,78,142,.22))',
-                }}
-              />
-            </div>
-          </div>
+        {/* Placed after the copy in the DOM on purpose. On a phone .ngp-hero-visual is in
+            normal flow, so this is what puts it *below* the headline rather than above it. From
+            the lg breakpoint up the same element is position:absolute and sits in the outer
+            corner, where source order has no bearing on where it lands — the copy stays on top
+            via z-index, not ordering. */}
+        <div className="ngp-hero-visual ngp-globe-in z-0">
+          <LogoNova className="h-full w-full" />
         </div>
       </section>
 
@@ -251,10 +196,13 @@ export default function Home() {
         </div>
       </section>
 
+      {/* The call to action sits here, straight after the work, rather than at the very bottom:
+          it lands while the projects are still in mind, and the testimonials, partners and FAQ
+          that follow go on answering the visitor who is not ready to act yet. */}
+      <CTASection />
       <Testimonials />
       <Partners />
       <FaqAccordion />
-      <CTASection />
     </div>
   )
 }

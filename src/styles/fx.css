@@ -402,34 +402,84 @@
   box-shadow: none;
 }
 
-/* ---------- hero globe placement ---------- */
+/* ---------- hero visual placement ---------- */
 
 /*
- * Two different jobs at two different sizes.
- *
- * On a wide screen the globe is decoration: absolutely placed, bled off the outer edge, sitting
- * behind copy that has its own column to live in.
- *
- * On a phone there is no second column. Overlapping the two put the mark directly on top of the
- * headline — the text was still there and still the right width, it was simply unreadable
- * against it. So below the breakpoint the globe stops being absolute and takes its own place in
- * the flow, above the copy, at a size that leaves room for it.
+ * Two jobs at two sizes, as before — but the subject changed. The globe was a cropped object
+ * that *wanted* to bleed past the edge; a centred mark with meteors radiating from it does not.
+ * Cut it off and the radiation looks lopsided, so this version stays fully inside the viewport
+ * and keeps clear of the copy column.
  */
-.ngp-hero-globe {
+.ngp-hero-visual {
   position: relative;
-  width: min(84vw, 340px);
-  height: min(84vw, 340px);
+  width: min(90vw, 380px);
+  height: min(90vw, 380px);
   margin-inline: auto;
-  margin-top: clamp(18px, 5vw, 36px);
+  margin-top: clamp(12px, 4vw, 30px);
 }
 
-@media (min-width: 1024px) {
-  .ngp-hero-globe {
+@media (min-width: 1120px) {
+  .ngp-hero-visual {
     position: absolute;
-    inset-inline-end: clamp(-18%, -6vw, -2%);
-    top: clamp(-90px, -5vw, -24px);
-    width: clamp(360px, 54vw, 700px);
-    height: clamp(360px, 54vw, 700px);
+    /* Sized and inset so its right edge clears the 660px copy column at every width from the
+       breakpoint up — at 1120 that leaves ~20px, which is the tightest case. */
+    inset-inline-end: clamp(16px, 3vw, 80px);
+    top: clamp(-10px, 1vw, 30px);
+    width: clamp(340px, 34vw, 520px);
+    height: clamp(340px, 34vw, 520px);
     margin: 0;
   }
+}
+
+/* ---------- logo cross-fade ---------- */
+
+/*
+ * The mark and the full lock-up trading places on one shared 9s cycle.
+ *
+ * Both are absolutely centred rather than laid out in flow: they have very different aspect
+ * ratios (0.92 against 2.94), so in flow each swap would resize the box and shove the meteor
+ * field around it. Centred and absolute, only their opacity and scale change.
+ *
+ * The two animations are deliberately offset halves of the same timeline — the gap where both
+ * are faint is what stops it reading as a hard cut.
+ */
+.ngp-logoswap {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.ngp-logoswap img {
+  position: absolute;
+  height: auto;
+  filter: drop-shadow(0 0 16px rgba(150, 120, 190, .45)) drop-shadow(0 0 40px rgba(107, 78, 142, .25));
+}
+.ngp-logoswap__mark {
+  width: 34%;
+  animation: ngpSwapMark 9s cubic-bezier(.65, 0, .35, 1) infinite;
+}
+.ngp-logoswap__full {
+  width: 62%;
+  animation: ngpSwapFull 9s cubic-bezier(.65, 0, .35, 1) infinite;
+}
+
+@keyframes ngpSwapMark {
+  0%, 38%   { opacity: 1; transform: scale(1) }
+  46%, 88%  { opacity: 0; transform: scale(.82) }
+  96%, 100% { opacity: 1; transform: scale(1) }
+}
+@keyframes ngpSwapFull {
+  0%, 38%   { opacity: 0; transform: scale(1.14) }
+  48%, 86%  { opacity: 1; transform: scale(1) }
+  94%, 100% { opacity: 0; transform: scale(1.14) }
+}
+
+/* Holding on the mark is the right still frame: it is the brand's primary asset, and the
+   wordmark is already in the navbar. */
+@media (prefers-reduced-motion: reduce) {
+  .ngp-logoswap__mark { animation: none; opacity: 1; transform: none }
+  .ngp-logoswap__full { animation: none; opacity: 0 }
+  .ngp-logoswap ~ div,
+  .ngp-logoswap + div { animation: none !important }
 }
