@@ -6,7 +6,7 @@ import { toHttpUrl } from '../lib/url'
 
 const TILE =
   'flex h-[74px] min-w-[168px] items-center justify-center rounded-[16px] border px-7 ' +
-  'transition-all duration-500 hover:-translate-y-1'
+  'transition-transform duration-500 hover:-translate-y-1'
 
 const TILE_STYLE = {
   borderColor: 'rgba(255,255,255,.07)',

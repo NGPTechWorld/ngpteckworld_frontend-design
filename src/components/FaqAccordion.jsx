@@ -26,7 +26,7 @@ function Row({ item, isOpen, onToggle }) {
       >
         <span className="text-[clamp(14.5px,2.2vw,16px)] font-semibold leading-snug">{item.q}</span>
         <span
-          className="grid h-7 w-7 shrink-0 place-items-center rounded-full border transition-all duration-300"
+          className="grid h-7 w-7 shrink-0 place-items-center rounded-full border transition-[transform,background-color,border-color] duration-300"
           style={{
             borderColor: isOpen ? 'rgba(150,120,190,.55)' : 'rgba(255,255,255,.12)',
             background: isOpen ? 'rgba(107,78,142,.3)' : 'transparent',

@@ -401,3 +401,35 @@
   transform: none;
   box-shadow: none;
 }
+
+/* ---------- hero globe placement ---------- */
+
+/*
+ * Two different jobs at two different sizes.
+ *
+ * On a wide screen the globe is decoration: absolutely placed, bled off the outer edge, sitting
+ * behind copy that has its own column to live in.
+ *
+ * On a phone there is no second column. Overlapping the two put the mark directly on top of the
+ * headline — the text was still there and still the right width, it was simply unreadable
+ * against it. So below the breakpoint the globe stops being absolute and takes its own place in
+ * the flow, above the copy, at a size that leaves room for it.
+ */
+.ngp-hero-globe {
+  position: relative;
+  width: min(84vw, 340px);
+  height: min(84vw, 340px);
+  margin-inline: auto;
+  margin-top: clamp(18px, 5vw, 36px);
+}
+
+@media (min-width: 1024px) {
+  .ngp-hero-globe {
+    position: absolute;
+    inset-inline-end: clamp(-18%, -6vw, -2%);
+    top: clamp(-90px, -5vw, -24px);
+    width: clamp(360px, 54vw, 700px);
+    height: clamp(360px, 54vw, 700px);
+    margin: 0;
+  }
+}

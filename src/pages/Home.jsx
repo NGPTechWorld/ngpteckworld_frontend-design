@@ -70,19 +70,41 @@ export default function Home() {
           breakpoint to keep it company; letting it overlap means the text keeps a comfortable
           measure and the globe simply crops. */}
       <section data-hero className="relative overflow-hidden">
-        {/* Pulled only slightly off the outer edge: far enough that the sphere reads as bigger
-            than the viewport, close enough that the continents — not an empty limb — are what
-            actually shows. The bottom is masked rather than cropped so it dissolves into the
-            section below instead of ending on a hard edge. */}
-        <div
-          className="ngp-globe-in pointer-events-none absolute z-0"
-          style={{
-            insetInlineEnd: 'clamp(-18%, -6vw, -2%)',
-            top: 'clamp(-90px, -5vw, -24px)',
-            width: 'clamp(360px, 54vw, 700px)',
-            height: 'clamp(360px, 54vw, 700px)',
-          }}
-        >
+        <div className="relative z-[1] mx-auto max-w-site px-[26px] pb-[clamp(36px,5vw,64px)] pt-[clamp(20px,4vw,104px)]">
+          <div className="max-w-[660px]">
+            <div className="ngp-hero-item mb-7" style={{ '--i': 0 }}>
+              <span className="inline-flex items-center gap-2.5 rounded-full border px-4 py-2 text-[12.5px] text-soft backdrop-blur-sm"
+                style={{ borderColor: 'rgba(150,120,190,.35)', background: 'rgba(48,29,61,.4)' }}>
+                <span className="relative flex h-[7px] w-[7px]">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" style={{ background: '#9678BE' }} />
+                  <span className="relative inline-flex h-[7px] w-[7px] rounded-full" style={{ background: '#C5B2E0' }} />
+                </span>
+                {t.heroBadge}
+              </span>
+            </div>
+
+            <h1 className="ngp-fluid ngp-hero-item mb-6 text-[clamp(34px,7.4vw,66px)] font-extrabold leading-[1.08] tracking-[-0.02em]" style={{ '--i': 1 }}>
+              {t.heroT1} <span className="ngp-grad">{t.heroAccent}</span>
+            </h1>
+
+            <p className="ngp-hero-item mb-9 max-w-[520px] text-[clamp(15px,2.4vw,18px)] leading-[1.8] text-muted" style={{ '--i': 2 }}>
+              {t.heroSub}
+            </p>
+
+            <div className="ngp-hero-item flex flex-wrap gap-3.5" style={{ '--i': 3 }}>
+              <Button to="/contact">{t.heroCta1}</Button>
+              <Button to="/portfolio" variant="outline">{t.heroCta2}</Button>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Placed after the copy in the DOM on purpose. On a phone .ngp-hero-globe is in normal
+            flow, so this is what puts it *below* the headline rather than above it. From the lg
+            breakpoint up the same element is position:absolute and bleeds off the outer edge,
+            where source order has no bearing on where it lands — the copy stays on top via
+            z-index, not ordering. */}
+        <div className="ngp-hero-globe ngp-globe-in pointer-events-none z-0">
           {/* The mask lives on this inner wrapper, not the outer one, so it fades the globe's
               bottom edge without also fading the mark sitting on top of it. */}
           <div
@@ -125,7 +147,9 @@ export default function Home() {
               <img
                 src="/assets/ngp-mark-white.png"
                 alt=""
-                className="relative w-[46%]"
+                width="512"
+                height="512"
+                className="relative h-auto w-[46%]"
                 style={{
                   animation: 'ngpFloat 7s ease-in-out infinite',
                   filter: 'drop-shadow(0 0 14px rgba(150,120,190,.38)) drop-shadow(0 0 34px rgba(107,78,142,.22))',
@@ -133,35 +157,6 @@ export default function Home() {
               />
             </div>
           </div>
-        </div>
-
-        <div className="relative z-[1] mx-auto max-w-site px-[26px] pb-[clamp(36px,5vw,64px)] pt-[clamp(56px,8vw,104px)]">
-          <div className="max-w-[660px]">
-            <div className="ngp-hero-item mb-7" style={{ '--i': 0 }}>
-              <span className="inline-flex items-center gap-2.5 rounded-full border px-4 py-2 text-[12.5px] text-soft backdrop-blur-sm"
-                style={{ borderColor: 'rgba(150,120,190,.35)', background: 'rgba(48,29,61,.4)' }}>
-                <span className="relative flex h-[7px] w-[7px]">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" style={{ background: '#9678BE' }} />
-                  <span className="relative inline-flex h-[7px] w-[7px] rounded-full" style={{ background: '#C5B2E0' }} />
-                </span>
-                {t.heroBadge}
-              </span>
-            </div>
-
-            <h1 className="ngp-fluid ngp-hero-item mb-6 text-[clamp(34px,7.4vw,66px)] font-extrabold leading-[1.08] tracking-[-0.02em]" style={{ '--i': 1 }}>
-              {t.heroT1} <span className="ngp-grad">{t.heroAccent}</span>
-            </h1>
-
-            <p className="ngp-hero-item mb-9 max-w-[520px] text-[clamp(15px,2.4vw,18px)] leading-[1.8] text-muted" style={{ '--i': 2 }}>
-              {t.heroSub}
-            </p>
-
-            <div className="ngp-hero-item flex flex-wrap gap-3.5" style={{ '--i': 3 }}>
-              <Button to="/contact">{t.heroCta1}</Button>
-              <Button to="/portfolio" variant="outline">{t.heroCta2}</Button>
-            </div>
-          </div>
-
         </div>
       </section>
 
