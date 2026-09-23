@@ -9,7 +9,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false)
   const links = [
     ['/', t.navHome], ['/services', t.navServices], ['/portfolio', t.navPortfolio],
-    ['/about', t.navAbout], ['/contact', t.navContact],
+    ['/team', t.navTeam], ['/about', t.navAbout], ['/contact', t.navContact],
   ]
   return (
     <nav className="sticky top-0 z-50 border-b border-[var(--border)]" style={{ backdropFilter: 'blur(16px)', background: 'rgba(26,15,38,.78)' }}>

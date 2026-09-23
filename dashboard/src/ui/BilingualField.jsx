@@ -98,6 +98,7 @@ export function BilingualField({
 /**
  * Arabic + English list of short strings (features, tasks): `${name}_ar` / `${name}_en` hold string[].
  *   <BilingualTags name="features" label="Features" control={control} errors={errors} />
+ * `placeholder` may be one string for both sides, or `{ ar, en }` for a different example per language.
  */
 export function BilingualTags({ name, label, control, errors, hint, max, placeholder, disabled, className }) {
   const c = useCommon()
@@ -117,7 +118,7 @@ export function BilingualTags({ name, label, control, errors, hint, max, placeho
                 value={field.value ?? []}
                 onChange={field.onChange}
                 max={max}
-                placeholder={placeholder}
+                placeholder={placeholder?.[lang] ?? (typeof placeholder === 'string' ? placeholder : undefined)}
                 disabled={disabled}
                 aria-label={typeof label === 'string' ? `${label} (${langName[lang]})` : undefined}
               />

@@ -1,7 +1,7 @@
 // Per-section access control. Mirrors the backend's `App\Models\User::SECTIONS` exactly — a feature id here
 // must be the same string as its `src/features/<id>/index.jsx`. Keep both lists in sync by hand; there is no
 // single source of truth shared across the two codebases.
-export const SECTIONS = ['faqs', 'page-content', 'partners', 'projects', 'requests', 'services', 'settings', 'stats', 'testimonials']
+export const SECTIONS = ['faqs', 'page-content', 'partners', 'projects', 'requests', 'services', 'settings', 'stats', 'team', 'testimonials']
 
 // Every signed-in admin gets this regardless of `permissions`: the signed-in admin's own profile/password.
 const ALWAYS_VISIBLE = ['account']

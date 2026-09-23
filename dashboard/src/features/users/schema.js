@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { newPassword, requiredEmail, requiredText } from '@/lib/validation'
 
 /** Every section a limited admin can be given — must mirror the backend's `User::SECTIONS` exactly. */
-export const SECTIONS = ['faqs', 'page-content', 'partners', 'projects', 'requests', 'services', 'settings', 'stats', 'testimonials']
+export const SECTIONS = ['faqs', 'page-content', 'partners', 'projects', 'requests', 'services', 'settings', 'stats', 'team', 'testimonials']
 
 export const ROLES = ['super_admin', 'admin']
 
