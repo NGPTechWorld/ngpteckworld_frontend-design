@@ -4,6 +4,7 @@ import { useCommon, useStrings } from '@/i18n'
 import { errorText } from '@/lib/errors'
 import { Alert, Button, EmptyState, PageHeader, PageSpinner } from '@/ui'
 import { team } from './hooks'
+import { PortfolioTab } from './PortfolioTab'
 import { toFormValues, toPayload } from './schema'
 import strings from './strings'
 import { TeamForm } from './TeamForm'
@@ -37,6 +38,9 @@ export default function TeamEdit() {
     <>
       <PageHeader title={t.editTitle} backTo="/team" backLabel={t.title} />
       <TeamForm key={profile.id} isEdit defaultValues={toFormValues(profile)} avatarUrl={profile.avatar_url} onSubmit={onSubmit} saving={update.isPending} />
+      <div className="mt-5">
+        <PortfolioTab teamId={profile.id} />
+      </div>
     </>
   )
 }

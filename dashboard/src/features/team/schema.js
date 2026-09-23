@@ -5,6 +5,7 @@ export const LIST_FIELDS = ['skills', 'education', 'experience', 'certifications
 
 export const emptyTeamProfile = {
   slug: '',
+  user_id: '',
   name_ar: '', name_en: '',
   job_title_ar: '', job_title_en: '',
   bio_ar: '', bio_en: '',
@@ -33,6 +34,7 @@ export function makeTeamProfileSchema(c) {
   const tags = z.array(tag)
   const schema = {
     slug: optionalText(c, 255),
+    user_id: z.union([z.literal(''), z.coerce.number().int()]),
     name_ar: requiredText(c, 255),
     name_en: requiredText(c, 255),
     job_title_ar: requiredText(c, 255),
@@ -66,6 +68,7 @@ export function makeTeamProfileSchema(c) {
 export const toFormValues = (profile) => {
   const values = {
     slug: profile.slug ?? '',
+    user_id: profile.user_id ?? '',
     name_ar: profile.name_ar, name_en: profile.name_en,
     job_title_ar: profile.job_title_ar, job_title_en: profile.job_title_en,
     bio_ar: profile.bio_ar, bio_en: profile.bio_en,
@@ -91,6 +94,7 @@ export const toFormValues = (profile) => {
 export const toPayload = (values) => ({
   ...values,
   slug: emptyToNull(values.slug),
+  user_id: values.user_id === '' ? null : values.user_id,
   avatar: values.avatar || null,
   email: emptyToNull(values.email),
   phone: emptyToNull(values.phone),

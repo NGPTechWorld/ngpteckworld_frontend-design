@@ -9,9 +9,7 @@ export default function FaqAccordion() {
   const [open, setOpen] = useState(0)
   useEffect(() => { api.getFaqs().then(setData).catch(() => {}) }, [])
 
-  const list = data && data.length
-    ? data.map((x) => ({ q: pick(x, 'question'), a: pick(x, 'answer') }))
-    : t.faqs
+  const list = (data ?? []).map((x) => ({ q: pick(x, 'question'), a: pick(x, 'answer') }))
   if (!list.length) return null
 
   return (

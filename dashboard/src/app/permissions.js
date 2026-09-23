@@ -10,10 +10,16 @@ const ALWAYS_VISIBLE = ['account']
 // SECTIONS they have (mirrors the backend's `super_admin`-only route groups: users.php, dashboard.php).
 const SUPER_ADMIN_ONLY = ['users', 'dashboard']
 
+// Visible only to the one account linked to it (mirrors the backend's per-request ownership check —
+// TeamProfile.user_id — which no flat SECTIONS permission can express). Not gated by `permissions` at all:
+// an admin with zero section permissions still sees this when their account has a linked team profile.
+const SELF_SERVICE = { 'my-portfolio': (user) => Boolean(user.team_profile_id) }
+
 /** Can the signed-in `user` see this feature at all (nav item + its routes)? */
 export function canAccessFeature(feature, user) {
   if (!user) return false
   if (ALWAYS_VISIBLE.includes(feature.id)) return true
+  if (feature.id in SELF_SERVICE) return SELF_SERVICE[feature.id](user)
   if (SUPER_ADMIN_ONLY.includes(feature.id)) return Boolean(user.is_super_admin)
   if (user.is_super_admin) return true
   return (user.permissions ?? []).includes(feature.id)

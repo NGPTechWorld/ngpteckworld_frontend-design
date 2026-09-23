@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useAuth } from '@/app/AuthProvider'
 import { useCommon, useStrings } from '@/i18n'
 import { applyServerErrors } from '@/lib/applyServerErrors'
-import { BilingualField, BilingualTags, Card, Field, FormActions, ImageUpload, Input, Switch } from '@/ui'
+import { users } from '@/features/users/hooks'
+import { BilingualField, BilingualTags, Card, Field, FormActions, ImageUpload, Input, Select, Switch } from '@/ui'
 import { emptyTeamProfile, makeTeamProfileSchema } from './schema'
 import strings from './strings'
 
@@ -18,6 +20,16 @@ export function TeamForm({ defaultValues = emptyTeamProfile, avatarUrl, onSubmit
   const t = useStrings(strings)
   const schema = useMemo(() => makeTeamProfileSchema(c), [c])
   const [uploading, setUploading] = useState(false)
+  // Linking a profile to a dashboard account is a super-admin-only capability (same gate as /users itself):
+  // a limited admin with only the "team" permission cannot list accounts, so this field is hidden for them
+  // instead of firing a request they are not allowed to make.
+  const { user: currentUser } = useAuth()
+  const canLinkAccount = Boolean(currentUser?.is_super_admin)
+  const usersQuery = users.useList({ per_page: 200, sort: 'name' }, { enabled: canLinkAccount })
+  const userOptions = useMemo(
+    () => [{ value: '', label: t.linkedAccountNone }, ...usersQuery.rows.map((u) => ({ value: String(u.id), label: `${u.name} (${u.email})` }))],
+    [usersQuery.rows, t.linkedAccountNone],
+  )
   const {
     register,
     control,
@@ -113,6 +125,11 @@ export function TeamForm({ defaultValues = emptyTeamProfile, avatarUrl, onSubmit
           <Field label={t.slug} error={errors.slug} hint={t.slugHint}>
             <Input {...register('slug')} dir="ltr" maxLength={255} placeholder="sara-ahmad" autoComplete="off" />
           </Field>
+          {canLinkAccount ? (
+            <Field label={t.linkedAccount} error={errors.user_id} hint={t.linkedAccountHint}>
+              <Select {...register('user_id')} options={userOptions} />
+            </Field>
+          ) : null}
           <Controller
             name="is_active"
             control={control}

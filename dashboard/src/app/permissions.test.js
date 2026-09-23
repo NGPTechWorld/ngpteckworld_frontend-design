@@ -32,6 +32,12 @@ describe('canAccessFeature', () => {
     expect(canAccessFeature(feature('users'), user)).toBe(false)
     expect(canAccessFeature(feature('dashboard'), user)).toBe(false)
   })
+
+  it('shows my-portfolio only when a team profile is linked to the account — with zero section permissions, and even for a super admin without a link', () => {
+    expect(canAccessFeature(feature('my-portfolio'), limited([]))).toBe(false)
+    expect(canAccessFeature(feature('my-portfolio'), { ...limited([]), team_profile_id: 7 })).toBe(true)
+    expect(canAccessFeature(feature('my-portfolio'), { ...superAdmin, team_profile_id: null })).toBe(false)
+  })
 })
 
 describe('filterFeaturesByUser', () => {

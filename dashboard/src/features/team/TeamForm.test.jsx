@@ -1,6 +1,6 @@
 import { screen, waitFor } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { mockApi, reply, validationError } from '@/test/mockApi'
+import { mockApi, paginated, reply, validationError } from '@/test/mockApi'
 import { renderWithProviders } from '@/test/renderWithProviders'
 import TeamCreate from './TeamCreate'
 import TeamEdit from './TeamEdit'
@@ -59,13 +59,13 @@ describe('TeamCreate', () => {
   })
 
   it('validates the required fields locally and sends nothing', async () => {
-    const server = mockApi({})
+    const server = mockApi({}) // the form also lists dashboard accounts (for linking); that GET is expected
     const { user } = renderWithProviders(<TeamCreate />, { route: '/team/new' })
 
     await user.click(screen.getByRole('button', { name: 'Save' }))
 
     expect(await screen.findAllByText('This field is required')).toHaveLength(6) // name/job_title/bio × ar+en
-    expect(server.requests).toHaveLength(0)
+    expect(server.calls('POST', '/team')).toHaveLength(0)
   })
 
   it('creates a member with the minimum fields, sending null for everything left blank', async () => {
@@ -110,8 +110,17 @@ describe('TeamEdit', () => {
   const route = '/team/7'
   const path = '/team/:id'
 
+  it("embeds the member's portfolio below the profile form", async () => {
+    mockApi({ 'GET /team/:id': () => ({ data: profile }), 'GET /team/:id/portfolio': () => paginated([]) })
+    renderWithProviders(<TeamEdit />, { route, path })
+
+    expect(await screen.findByLabelText('Name (English)')).toHaveValue('Sara Ahmad')
+    expect(screen.getByRole('heading', { name: 'Portfolio' })).toBeInTheDocument()
+    expect(await screen.findByText('No portfolio items yet')).toBeInTheDocument()
+  })
+
   it('loads the record into the form and keeps Save disabled until something changes', async () => {
-    mockApi({ 'GET /team/:id': () => ({ data: profile }) })
+    mockApi({ 'GET /team/:id': () => ({ data: profile }), 'GET /team/:id/portfolio': () => paginated([]) })
     const { user } = renderWithProviders(<TeamEdit />, { route, path })
 
     expect(await screen.findByLabelText('Name (English)')).toHaveValue('Sara Ahmad')
@@ -129,6 +138,7 @@ describe('TeamEdit', () => {
     const server = mockApi({
       'GET /team/:id': () => ({ data: profile }),
       'PUT /team/:id': ({ params, body }) => ({ data: { ...profile, ...body, id: Number(params.id) } }),
+      'GET /team/:id/portfolio': () => paginated([]),
     })
     const { user } = renderWithProviders(<TeamEdit />, { route, path })
     const english = await screen.findByLabelText('Job title (English)')

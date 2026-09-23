@@ -94,13 +94,13 @@ export function Modal({ open, onClose, title, description, size = 'md', footer, 
         aria-describedby={description ? descriptionId : undefined}
         tabIndex={-1}
         className={cx(
-          'relative w-full rounded-t-panel border border-white/[.1] bg-surface shadow-pop animate-pop-in focus:outline-none sm:rounded-panel',
+          'relative flex max-h-[92dvh] w-full flex-col rounded-t-panel border border-white/[.1] bg-surface shadow-pop animate-pop-in focus:outline-none sm:max-h-[85dvh] sm:rounded-panel',
           sizes[size],
           className,
         )}
       >
         {title || !hideClose ? (
-          <div className="flex items-start justify-between gap-4 px-6 pb-2 pt-5">
+          <div className="flex shrink-0 items-start justify-between gap-4 px-6 pb-2 pt-5">
             <div className="min-w-0">
               {title ? (
                 <h2 id={titleId} className="text-lg font-bold text-ink">
@@ -116,8 +116,8 @@ export function Modal({ open, onClose, title, description, size = 'md', footer, 
             {!hideClose ? <IconButton icon={X} label={c.close} onClick={() => onCloseRef.current?.()} className="-me-2 -mt-1" /> : null}
           </div>
         ) : null}
-        <div className="px-6 py-3">{children}</div>
-        {footer ? <div className="flex flex-wrap items-center justify-end gap-2 border-t border-white/[.08] px-6 py-4">{footer}</div> : null}
+        <div className="min-h-0 flex-1 overflow-y-auto px-6 py-3">{children}</div>
+        {footer ? <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-white/[.08] px-6 py-4">{footer}</div> : null}
       </div>
     </div>,
     document.body,

@@ -4,6 +4,8 @@ import { useLang } from '../i18n/LanguageContext'
 import { api } from '../lib/api'
 import Icon from '../components/Icon'
 import PageTitle from '../components/PageTitle'
+import PortfolioItemCard from '../components/PortfolioItemCard'
+import PortfolioItemModal from '../components/PortfolioItemModal'
 import { initials } from '../lib/visuals'
 import { toHttpUrl } from '../lib/url'
 
@@ -43,8 +45,9 @@ export default function TeamMemberDetail() {
   const { slug } = useParams()
   const { t, pick } = useLang()
   const [member, setMember] = useState(null)
+  const [openItem, setOpenItem] = useState(null)
 
-  useEffect(() => { setMember(null); api.getTeamMember(slug).then(setMember).catch(() => setMember(false)) }, [slug])
+  useEffect(() => { setMember(null); setOpenItem(null); api.getTeamMember(slug).then(setMember).catch(() => setMember(false)) }, [slug])
 
   if (member === false) return <div className="mx-auto max-w-narrow px-[26px] py-24 text-center text-muted">{t.mNotFound}</div>
   if (!member) return <div className="mx-auto max-w-narrow px-[26px] py-24 text-center text-muted">…</div>
@@ -93,6 +96,17 @@ export default function TeamMemberDetail() {
         <div className="mb-[46px]">
           <h2 className="mb-3.5 text-[24px] font-bold">{t.mAbout}</h2>
           <p className="text-[16.5px] leading-[1.9] text-soft">{pick(member, 'bio')}</p>
+        </div>
+      )}
+
+      {member.portfolio?.length > 0 && (
+        <div className="mb-[46px]">
+          <h2 className="mb-[18px] text-[24px] font-bold">{t.mPortfolio}</h2>
+          <div data-grid3 className="grid gap-[16px]" style={{ gridTemplateColumns: 'repeat(3,1fr)' }}>
+            {member.portfolio.map((item) => (
+              <PortfolioItemCard key={item.id} item={item} onOpen={() => setOpenItem(item)} />
+            ))}
+          </div>
         </div>
       )}
 
@@ -145,6 +159,8 @@ export default function TeamMemberDetail() {
           </div>
         </div>
       )}
+
+      {openItem && <PortfolioItemModal item={openItem} onClose={() => setOpenItem(null)} />}
     </div>
   )
 }

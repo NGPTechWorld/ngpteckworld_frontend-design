@@ -11,7 +11,7 @@ export default function Partners() {
   const [data, setData] = useState(null)
   useEffect(() => { api.getPartners().then(setData).catch(() => {}) }, [])
 
-  const list = data && data.length ? data : t.partners
+  const list = data ?? []
   if (!list.length) return null
 
   return (

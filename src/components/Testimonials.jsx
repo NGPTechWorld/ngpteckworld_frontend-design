@@ -21,9 +21,7 @@ export default function Testimonials() {
   const [data, setData] = useState(null)
   useEffect(() => { api.getTestimonials().then(setData).catch(() => {}) }, [])
 
-  const list = data && data.length
-    ? data.map((x) => ({ name: x.name, company: x.company, quote: pick(x, 'quote'), rating: x.rating, avatar: x.avatar }))
-    : t.testimonials
+  const list = (data ?? []).map((x) => ({ name: x.name, company: x.company, quote: pick(x, 'quote'), rating: x.rating, avatar: x.avatar }))
   if (!list.length) return null
 
   return (
