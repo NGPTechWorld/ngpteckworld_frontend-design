@@ -1,4 +1,5 @@
 @import './styles/tokens.css';
+@import './styles/fx.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -33,12 +34,16 @@ input,textarea,button{font-family:inherit}
 @media (max-width:480px){
   [data-grid4]{grid-template-columns:1fr!important}
 }
-/* fluid headings + hero spacing on small screens */
+/* Small-screen safety net for headings that still carry a fixed px size (About, Contact,
+   ProjectDetail, TeamMemberDetail and friends). `!important` is needed because a Tailwind
+   arbitrary value like text-[44px] is a class and would otherwise win over a bare element
+   selector.
+   `.ngp-fluid` opts out: those headings already size themselves with clamp() across the whole
+   range, and forcing them back down here would flatten the scale they were tuned for. */
 @media (max-width:640px){
-  h1{font-size:clamp(28px,8vw,40px)!important;line-height:1.18!important}
-  h2{font-size:clamp(22px,6vw,30px)!important}
-  h3{font-size:clamp(17px,4.5vw,20px)!important}
-  [data-hero]{padding-top:56px!important}
+  h1:not(.ngp-fluid){font-size:clamp(28px,8vw,40px)!important;line-height:1.18!important}
+  h2:not(.ngp-fluid){font-size:clamp(22px,6vw,30px)!important}
+  h3:not(.ngp-fluid){font-size:clamp(17px,4.5vw,20px)!important}
 }
 .btn{transition:transform .25s,box-shadow .25s,background .25s;cursor:pointer}
 .btn:hover{transform:translateY(-2px)}

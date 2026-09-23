@@ -14,6 +14,14 @@ export const ui = {
     heroSub: 'في NGP TechWorld نحوّل أفكارك إلى منتجات برمجية متكاملة — مواقع، تطبيقات، وأنظمة ذكية تنقل أعمالك لمستوى آخر.',
     heroCta1: 'تواصل معنا',
     heroCta2: 'شاهد أعمالنا',
+    // Capability strip under the hero — the labelled icon row from the brand cover.
+    caps: {
+      web: 'حلول برمجية',
+      mobile: 'تطبيقات موبايل',
+      cloud: 'خدمات سحابية',
+      security: 'أمن معلومات',
+      data: 'تحليل بيانات',
+    },
     intro: 'نحن فريق من المهندسين والمصممين الشغوفين ببناء حلول برمجية تصنع فرقاً حقيقياً. نجمع بين الهندسة الدقيقة والتصميم الجميل لنقدّم تجارب رقمية يحبّها المستخدمون.',
     stats: [
       { n: '240+', l: 'مشروع منجز' },
@@ -54,6 +62,7 @@ export const ui = {
     dGallery: 'معرض الصور',
     dVideo: 'الفيديو التعريفي',
     dVideoOpen: 'مشاهدة الفيديو ↗',
+    loadingLabel: 'جاري التحميل',
     loadError: 'تعذّر تحميل المحتوى حالياً. حاول مجدداً بعد قليل.',
     dTeam: 'فريق التنفيذ ومهامهم',
     dLinks: 'روابط المشروع',
@@ -174,6 +183,14 @@ export const ui = {
     heroSub: 'At NGP TechWorld we turn your ideas into complete software products — websites, apps and intelligent systems that take your business to the next level.',
     heroCta1: 'Contact us',
     heroCta2: 'See our work',
+    // Capability strip under the hero — the labelled icon row from the brand cover.
+    caps: {
+      web: 'Software Solutions',
+      mobile: 'Mobile Apps',
+      cloud: 'Cloud Services',
+      security: 'IT Security',
+      data: 'Data Analytics',
+    },
     intro: 'We are a team of engineers and designers passionate about building software that makes a real difference. We blend precise engineering with beautiful design to deliver digital experiences users love.',
     stats: [
       { n: '240+', l: 'Projects delivered' },
@@ -214,6 +231,7 @@ export const ui = {
     dGallery: 'Gallery',
     dVideo: 'Project video',
     dVideoOpen: 'Watch video ↗',
+    loadingLabel: 'Loading',
     loadError: "We couldn't load this content right now. Please try again shortly.",
     dTeam: 'Team & their tasks',
     dLinks: 'Project links',

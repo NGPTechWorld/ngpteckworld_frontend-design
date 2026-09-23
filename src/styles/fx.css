@@ -1,0 +1,403 @@
+/* ==========================================================================
+   Motion + surface layer.
+
+   Two rules hold this together:
+   1. Nothing here may hide content unless JS has confirmed it can reveal it again — every
+      entrance animation is gated behind `.fx-ready`, which ScrollFX adds at runtime.
+   2. Every animation is switched off under `prefers-reduced-motion`, at the bottom of the file.
+   ========================================================================== */
+
+/* ---------- backdrop ---------- */
+
+.ngp-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ngp-aurora {
+  position: absolute;
+  border-radius: 50%;
+  opacity: .5;
+}
+/* No `filter: blur()` here, and no `will-change`.
+   The blur was the single most expensive thing on the page: three 46vw layers, each re-blurred
+   by the compositor on every frame of their drift. A radial-gradient that already fades to
+   transparent needs none of it — the softness is in the colour stops. And per Motion's guidance,
+   `will-change` is redundant for CSS `animation`: the browser promotes the layer itself. */
+.ngp-aurora--1 {
+  width: 46vw; height: 46vw; min-width: 380px; min-height: 380px;
+  top: -12vw; inset-inline-start: -10vw;
+  background: radial-gradient(circle, rgba(107, 78, 142, .5), rgba(107, 78, 142, .16) 42%, transparent 72%);
+  animation: ngpDrift1 26s ease-in-out infinite;
+}
+.ngp-aurora--2 {
+  width: 40vw; height: 40vw; min-width: 320px; min-height: 320px;
+  top: 32vh; inset-inline-end: -12vw;
+  background: radial-gradient(circle, rgba(150, 120, 190, .34), rgba(150, 120, 190, .1) 40%, transparent 70%);
+  animation: ngpDrift2 32s ease-in-out infinite;
+}
+.ngp-aurora--3 {
+  width: 52vw; height: 52vw; min-width: 400px; min-height: 400px;
+  bottom: -18vw; inset-inline-start: 22vw;
+  background: radial-gradient(circle, rgba(48, 29, 61, .8), rgba(48, 29, 61, .3) 44%, transparent 74%);
+  animation: ngpDrift3 38s ease-in-out infinite;
+}
+
+@keyframes ngpDrift1 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50%      { transform: translate3d(6vw, 5vh, 0) scale(1.12); }
+}
+@keyframes ngpDrift2 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1.05); }
+  50%      { transform: translate3d(-5vw, -6vh, 0) scale(.92); }
+}
+@keyframes ngpDrift3 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50%      { transform: translate3d(-7vw, -4vh, 0) scale(1.1); }
+}
+
+.ngp-circuit {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: .22;
+}
+/* Traces draw themselves in, then hold. */
+.ngp-circuit path {
+  stroke-dasharray: 1400;
+  stroke-dashoffset: 1400;
+  animation: ngpTraceIn 3.2s cubic-bezier(.22, .75, .25, 1) forwards;
+}
+.ngp-circuit path:nth-child(2) { animation-delay: .25s }
+.ngp-circuit path:nth-child(3) { animation-delay: .5s }
+.ngp-circuit path:nth-child(4) { animation-delay: .75s }
+.ngp-circuit path:nth-child(5) { animation-delay: 1s }
+.ngp-circuit path:nth-child(6) { animation-delay: 1.25s }
+@keyframes ngpTraceIn { to { stroke-dashoffset: 0 } }
+
+.ngp-node {
+  transform-origin: center;
+  animation: ngpNodePulse 4.5s ease-in-out infinite;
+}
+@keyframes ngpNodePulse {
+  0%, 100% { opacity: .25; r: 2.2 }
+  50%      { opacity: .95; r: 3.4 }
+}
+
+/* Grain breaks up the large flat gradients, which otherwise band badly on 8-bit panels. */
+.ngp-grain {
+  position: absolute;
+  inset: -160px;
+  opacity: .035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: ngpGrain 7s steps(6) infinite;
+}
+@keyframes ngpGrain {
+  0%   { transform: translate(0, 0) }
+  20%  { transform: translate(-3%, 2%) }
+  40%  { transform: translate(2%, -3%) }
+  60%  { transform: translate(-2%, -2%) }
+  80%  { transform: translate(3%, 1%) }
+  100% { transform: translate(0, 0) }
+}
+
+.ngp-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, transparent 35%, rgba(12, 6, 20, .55) 100%);
+}
+
+/* Everything the app renders sits above the backdrop. */
+.ngp-app { position: relative; z-index: 1 }
+
+/* ---------- entrance choreography ---------- */
+
+/* Staggered reveal. `--i` is the index within a group; the delay is capped so a long list never
+   leaves the last card waiting seconds after the rest have settled. */
+.fx-ready [data-rise] {
+  opacity: 0;
+  transform: translateY(26px);
+  transition:
+    opacity .7s cubic-bezier(.22, .75, .25, 1),
+    transform .7s cubic-bezier(.22, .75, .25, 1);
+  transition-delay: calc(min(var(--i, 0) * 90ms, 540ms));
+}
+.fx-ready [data-rise].in { opacity: 1; transform: none }
+
+/* Hero copy runs on load rather than on scroll — it is already in view. */
+@keyframes ngpHeroIn {
+  from { opacity: 0; transform: translateY(24px) }
+  to   { opacity: 1; transform: none }
+}
+.ngp-hero-item {
+  opacity: 0;
+  animation: ngpHeroIn .85s cubic-bezier(.22, .75, .25, 1) forwards;
+  animation-delay: calc(var(--i, 0) * 110ms + 120ms);
+}
+
+@keyframes ngpGlobeIn {
+  from { opacity: 0; transform: scale(.88) }
+  to   { opacity: 1; transform: none }
+}
+.ngp-globe-in { animation: ngpGlobeIn 1.6s cubic-bezier(.22, .75, .25, 1) both }
+
+/* ---------- surfaces ---------- */
+
+/* The card treatment the whole page is built from: a hairline gradient border, a cursor-tracked
+   spotlight, and corner brackets that only light up on hover.
+
+   The border is a pseudo-element with `mask-composite` rather than `border-image`, because a real
+   gradient border cannot be rounded — border-image ignores border-radius entirely. */
+.ngp-card {
+  position: relative;
+  isolation: isolate;
+  border-radius: 20px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .045), rgba(255, 255, 255, .012));
+  border: 1px solid rgba(255, 255, 255, .07);
+  overflow: hidden;
+  transition:
+    transform .5s cubic-bezier(.22, .75, .25, 1),
+    border-color .45s ease,
+    box-shadow .45s ease;
+}
+.ngp-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(140deg, rgba(197, 178, 224, .55), rgba(107, 78, 142, 0) 42%, rgba(150, 120, 190, .4));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity .45s ease;
+  pointer-events: none;
+}
+/* Spotlight. --mx/--my are written by the pointer handler in useSpotlight. */
+.ngp-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    380px circle at var(--mx, 50%) var(--my, 0%),
+    rgba(150, 120, 190, .18),
+    transparent 62%
+  );
+  opacity: 0;
+  transition: opacity .4s ease;
+  pointer-events: none;
+}
+.ngp-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(150, 120, 190, .34);
+  box-shadow: 0 30px 60px -32px rgba(107, 78, 142, .75);
+}
+.ngp-card:hover::before,
+.ngp-card:hover::after { opacity: 1 }
+
+/* Corner brackets — the engineered detail that ties the cards to the circuit backdrop. */
+.ngp-bracket {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  border-color: rgba(197, 178, 224, .65);
+  opacity: 0;
+  transition: opacity .45s ease, transform .45s ease;
+  pointer-events: none;
+}
+.ngp-card:hover .ngp-bracket { opacity: 1; transform: none }
+.ngp-bracket--tl { top: 11px; inset-inline-start: 11px; border-top: 1.5px solid; border-inline-start: 1.5px solid; transform: translate(4px, 4px) }
+.ngp-bracket--br { bottom: 11px; inset-inline-end: 11px; border-bottom: 1.5px solid; border-inline-end: 1.5px solid; transform: translate(-4px, -4px) }
+[dir='rtl'] .ngp-bracket--tl { transform: translate(-4px, 4px) }
+[dir='rtl'] .ngp-bracket--br { transform: translate(4px, -4px) }
+[dir='rtl'] .ngp-card:hover .ngp-bracket { transform: none }
+
+/* Hexagon frame for icons — echoes the logo mark. */
+.ngp-hex {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 64px;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background: linear-gradient(145deg, rgba(150, 120, 190, .42), rgba(107, 78, 142, .16));
+  transition: transform .5s cubic-bezier(.22, .75, .25, 1), background .45s ease;
+}
+.ngp-card:hover .ngp-hex {
+  transform: rotate(-6deg) scale(1.06);
+  background: linear-gradient(145deg, rgba(180, 150, 220, .6), rgba(107, 78, 142, .28));
+}
+
+/* ---------- type details ---------- */
+
+/* The wide-tracked micro-label from the brand cover ("SOFTWARE SOLUTIONS"). */
+.ngp-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--accent-lighter);
+}
+.ngp-kicker::before {
+  content: '';
+  width: 26px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-light));
+}
+[dir='rtl'] .ngp-kicker { letter-spacing: .1em }
+
+/* Gradient text for the accent half of a heading. */
+.ngp-grad {
+  background: linear-gradient(120deg, #E2D2F6 0%, #9678BE 45%, #C5B2E0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* A hairline that fades out at both ends, used to separate sections. */
+.ngp-rule {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(150, 120, 190, .45), transparent);
+}
+
+/* Sheen that sweeps across a button on hover. */
+.ngp-sheen { position: relative; overflow: hidden }
+.ngp-sheen::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  inset-inline-start: -120%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .22), transparent);
+  transition: inset-inline-start .7s cubic-bezier(.22, .75, .25, 1);
+}
+.ngp-sheen:hover::after { inset-inline-start: 130% }
+
+/* Marquee used by the partner strip. The track holds two copies of the list, so translating it
+   by exactly -50% lands on an identical frame and the loop is seamless. */
+.ngp-marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.ngp-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: ngpMarqueeLtr 38s linear infinite;
+}
+.ngp-marquee:hover .ngp-marquee-track { animation-play-state: paused }
+
+/* Both keyframes state `from` explicitly, and RTL gets its own set rather than
+   `animation-direction: reverse`.
+   The first version wrote only `to { translateX(-50%) }` and reversed it for RTL. With no `from`
+   keyframe the start of the animation is the element's underlying value, and reversing that pair
+   parked the track at -50% — half the strip's width off to the side — so the partner logos were
+   in the DOM, occupied their space, and painted nothing on screen. Two explicit, self-contained
+   keyframe sets cannot land in that state. */
+@keyframes ngpMarqueeLtr {
+  from { transform: translateX(0) }
+  to   { transform: translateX(-50%) }
+}
+@keyframes ngpMarqueeRtl {
+  from { transform: translateX(0) }
+  to   { transform: translateX(50%) }
+}
+[dir='rtl'] .ngp-marquee-track { animation-name: ngpMarqueeRtl }
+
+/* ---------- reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .ngp-aurora,
+  .ngp-grain,
+  .ngp-node,
+  .ngp-marquee-track { animation: none !important }
+  .ngp-circuit path { stroke-dashoffset: 0; animation: none !important }
+  .fx-ready [data-rise] { opacity: 1 !important; transform: none !important; transition: none !important }
+  .ngp-hero-item { opacity: 1; animation: none !important }
+  .ngp-globe-in { animation: none !important }
+  .ngp-card { transition: none }
+  .ngp-card:hover { transform: none }
+}
+
+/* ---------- loading skeletons ---------- */
+
+/* A placeholder that mirrors the shape of what is still loading, so a section reserves its space
+   instead of collapsing and then shoving the page down when the data lands. */
+.ngp-skel {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .05);
+}
+.ngp-skel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(197, 178, 224, .13) 45%,
+    rgba(197, 178, 224, .2) 50%,
+    rgba(197, 178, 224, .13) 55%,
+    transparent
+  );
+  animation: ngpShimmer 1.5s ease-in-out infinite;
+}
+/* The sweep is mirrored in RTL so it always travels with the reading direction. */
+[dir='rtl'] .ngp-skel::after { animation-name: ngpShimmerRtl }
+
+@keyframes ngpShimmer    { to { transform: translateX(100%) } }
+@keyframes ngpShimmerRtl { from { transform: translateX(100%) } to { transform: translateX(-100%) } }
+
+@media (prefers-reduced-motion: reduce) {
+  .ngp-skel::after { animation: none }
+}
+
+/* Spinner for slots where a skeleton alone does not read as "working" — the promo frame, which
+   is one large rectangle rather than a set of card shapes. */
+.ngp-spinner {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid rgba(197, 178, 224, .18);
+  border-top-color: var(--accent-lighter);
+  animation: ngpSpin .8s linear infinite;
+}
+@keyframes ngpSpin { to { transform: rotate(360deg) } }
+@media (prefers-reduced-motion: reduce) { .ngp-spinner { animation: none } }
+
+/* ---------- section rhythm ---------- */
+
+/* One spacing scale for every section on the page. Before this each section carried its own
+   hand-picked padding (pb-20, pb-[90px], pb-[70px]…), which is most of why the page read as
+   assembled from different pieces. */
+.ngp-section {
+  margin-inline: auto;
+  max-width: 1200px;
+  padding-inline: 26px;
+  padding-bottom: clamp(56px, 8vw, 96px);
+}
+@media (max-width: 560px) {
+  .ngp-section { padding-inline: 18px }
+}
+
+/* Rows that belong to a list rather than a grid — an accordion, say. They keep the card surface
+   and the spotlight, but not the lift: a row that jumps up under the cursor while the row below
+   it stays put breaks the line of the stack. */
+.ngp-card--flat:hover {
+  transform: none;
+  box-shadow: none;
+}
