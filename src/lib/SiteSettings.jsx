@@ -19,14 +19,40 @@ export const SOCIAL_KEYS = ['facebook', 'instagram', 'linkedin', 'x', 'whatsapp'
 
 const SiteSettingsContext = createContext({ ...DEFAULT_SETTINGS, loaded: true })
 
+// The last answer of /api/settings, so a returning visitor gets the right sections on the very first
+// paint instead of waiting for the request. It is refreshed on every visit.
+const CACHE_KEY = 'ngp.settings'
+
+function readCache() {
+  try {
+    const cached = JSON.parse(localStorage.getItem(CACHE_KEY))
+    return cached && typeof cached === 'object' ? cached : null
+  } catch {
+    return null
+  }
+}
+
+function writeCache(data) {
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)) } catch { /* private mode / storage full */ }
+}
+
 /** Loads the dashboard-managed contact details, social links and visible sections once for the whole site. */
 export function SiteSettingsProvider({ children }) {
-  const [settings, setSettings] = useState({ ...DEFAULT_SETTINGS, loaded: false })
+  const [settings, setSettings] = useState(() => {
+    const cached = readCache()
+    // `loaded` = we know which sections are on (from the cache or the API)
+    return cached ? { ...DEFAULT_SETTINGS, ...cached, loaded: true } : { ...DEFAULT_SETTINGS, loaded: false }
+  })
 
   useEffect(() => {
     let alive = true
     api.getSettings()
-      .then((data) => { if (alive) setSettings({ ...DEFAULT_SETTINGS, ...data, loaded: true }) })
+      .then((data) => {
+        if (!alive || !data) return
+        writeCache(data)
+        setSettings({ ...DEFAULT_SETTINGS, ...data, loaded: true })
+      })
+      // API down and nothing cached: fall back to showing everything
       .catch(() => { if (alive) setSettings((s) => ({ ...s, loaded: true })) })
     return () => { alive = false }
   }, [])
@@ -36,10 +62,14 @@ export function SiteSettingsProvider({ children }) {
 
 export const useSiteSettings = () => useContext(SiteSettingsContext)
 
-/** `shown('testimonials')` → false only when the dashboard switched that section / page off. */
+/**
+ * `shown('testimonials')` → false when the dashboard switched that section / page off — and also while it is not
+ * known yet (first visit, request still running): a switchable part then appears a moment later rather than
+ * flashing and disappearing.
+ */
 export function useSections() {
-  const { sections } = useSiteSettings()
-  return (key) => sections?.[key] !== false
+  const { sections, loaded } = useSiteSettings()
+  return (key) => loaded && sections?.[key] !== false
 }
 
 /** Route wrapper for a page the dashboard can hide (`section` = e.g. 'team'): hidden → the 404 page. */

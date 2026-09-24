@@ -39,6 +39,7 @@ async function fillAndSubmit() {
 const httpError = (status, body) => Object.assign(new Error(`API ${status}`), { status, body })
 
 beforeEach(() => {
+  localStorage.clear() // SiteSettings caches the last answer; every test starts as a first visit
   api.getSettings.mockReset().mockResolvedValue(settings)
   api.getServices.mockReset().mockResolvedValue(services)
   api.postContact.mockReset()
