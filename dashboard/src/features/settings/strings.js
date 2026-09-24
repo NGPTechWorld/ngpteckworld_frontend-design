@@ -1,6 +1,14 @@
 // Feature strings: { ar: {…}, en: {…} }. Save / Cancel / validation messages come from `useCommon()`.
 export default {
   ar: {
+    sectionLaunch: 'صفحة الافتتاح',
+    launchHint: 'تعرض عدّاً تنازلياً بدل الموقع لحتى موعد الافتتاح. الداشبورد والـ API يظلّان يعملان كالعادة.',
+    launchEnabled: 'تفعيل العدّ التنازلي',
+    launchEnabledHint: 'الزوّار يرون صفحة الافتتاح بدل الموقع.',
+    launchAt: 'موعد الافتتاح',
+    launchAtHint: 'بتوقيتك المحلي. الموقع يفتح من نفسه في هذه اللحظة دون الحاجة لإطفاء المفتاح.',
+    launchLive: 'العدّ التنازلي يعمل الآن — الموقع مغلق أمام الزوّار.',
+    launchPassed: 'الموعد مضى، والموقع مفتوح. يمكنك إطفاء المفتاح وحذف الموعد.',
     title: 'إعدادات الموقع',
     description: 'بيانات التواصل وروابط الشبكات الاجتماعية التي تظهر للزوار في الموقع.',
 
@@ -52,6 +60,14 @@ export default {
     loadFailedTitle: 'تعذّر تحميل الإعدادات',
   },
   en: {
+    sectionLaunch: 'Launch page',
+    launchHint: 'Shows a countdown instead of the site until the launch moment. The dashboard and API keep working as usual.',
+    launchEnabled: 'Run the countdown',
+    launchEnabledHint: 'Visitors see the launch page instead of the site.',
+    launchAt: 'Launch moment',
+    launchAtHint: 'In your local time. The site opens by itself at that moment — nobody has to switch this off.',
+    launchLive: 'The countdown is running — the site is closed to visitors.',
+    launchPassed: 'The moment has passed and the site is open. You can switch this off and clear the date.',
     title: 'Site settings',
     description: 'The contact details and social links that visitors see on the website.',
 

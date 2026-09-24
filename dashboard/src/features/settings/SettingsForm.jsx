@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Controller, useForm } from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link2, Mail, MessageCircle, Phone } from 'lucide-react'
 import { useCommon, useStrings } from '@/i18n'
@@ -25,6 +25,20 @@ export function SettingsForm({ defaultValues, onSubmit, saving = false }) {
     setError,
     formState: { errors, isDirty, dirtyFields },
   } = useForm({ resolver: zodResolver(schema), defaultValues })
+
+  // Reflects what the site is doing right now, which the two inputs alone do not say: a switch
+  // that is on with a moment already past looks identical to one that is actively holding the
+  // site closed.
+  const launchEnabled = useWatch({ control, name: 'launch_enabled' })
+  const launchAt = useWatch({ control, name: 'launch_at' })
+  const launchState = useMemo(() => {
+    if (!launchEnabled || !launchAt) return null
+    const at = new Date(launchAt).getTime()
+    if (Number.isNaN(at)) return null
+    return at > Date.now()
+      ? { tone: 'warning', text: t.launchLive }
+      : { tone: 'success', text: t.launchPassed }
+  }, [launchEnabled, launchAt, t])
 
   const submit = handleSubmit(async (values) => {
     const payload = toPayload(values, dirtyFields)
@@ -93,6 +107,26 @@ export function SettingsForm({ defaultValues, onSubmit, saving = false }) {
               </div>
             </fieldset>
           ))}
+        </div>
+      </Card>
+
+      <Card title={t.sectionLaunch} description={t.launchHint}>
+        <div className="space-y-6">
+          <Controller
+            name="launch_enabled"
+            control={control}
+            render={({ field }) => (
+              <Switch checked={field.value} onChange={field.onChange} label={t.launchEnabled} description={t.launchEnabledHint} />
+            )}
+          />
+
+          <Field label={t.launchAt} error={errors.launch_at} hint={t.launchAtHint}>
+            {/* datetime-local, so the admin types the wall-clock time they mean; schema.js converts
+                it to a real instant on the way to the API and back again on the way in. */}
+            <Input type="datetime-local" {...register('launch_at')} dir="ltr" />
+          </Field>
+
+          {launchState ? <Alert tone={launchState.tone}>{launchState.text}</Alert> : null}
         </div>
       </Card>
 

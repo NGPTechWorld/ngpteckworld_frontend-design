@@ -12,6 +12,10 @@ export const DEFAULT_SETTINGS = {
   whatsapp: null,
   // { key: bool } set from the dashboard; a key that is missing (or not loaded yet) counts as shown
   sections: {},
+  // The pre-launch gate. Both default to "open": if the API is unreachable the site must still be
+  // the site — a countdown nobody can switch off is a far worse failure than a missing section.
+  counting_down: false,
+  launch_at: null,
 }
 
 // Order the social buttons appear in.

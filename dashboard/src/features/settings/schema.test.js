@@ -4,14 +4,14 @@ import { FIELDS, SECTIONS, SOCIALS, makeSettingsSchema, toFormValues, toPayload 
 
 const schema = makeSettingsSchema(common.en)
 const allShown = Object.fromEntries(SECTIONS.map((key) => [key, true]))
-const empty = { ...Object.fromEntries(FIELDS.map((key) => [key, ''])), sections: allShown }
+const empty = { ...Object.fromEntries(FIELDS.map((key) => [key, ''])), sections: allShown, launch_enabled: false, launch_at: '' }
 const issues = (values) => (schema.safeParse({ ...empty, ...values }).error?.issues ?? []).map((issue) => `${issue.path.join('.')}: ${issue.message}`)
 
 describe('toFormValues', () => {
   it('turns null into empty strings and covers every field', () => {
     expect(toFormValues({ email: 'a@b.co', phone: null, facebook: null })).toEqual({ ...empty, email: 'a@b.co' })
     expect(toFormValues(undefined)).toEqual(empty)
-    expect(Object.keys(toFormValues({}))).toEqual([...FIELDS, 'sections'])
+    expect(Object.keys(toFormValues({}))).toEqual([...FIELDS, 'sections', 'launch_enabled', 'launch_at'])
   })
 
   it('shows every section the API does not mention', () => {
@@ -58,5 +58,35 @@ describe('toPayload', () => {
     expect(toPayload(values, { sections: { faq: true } })).toEqual({ sections: { faq: false } })
     expect(toPayload(values, { sections: { faq: true, stats: true }, phone: true })).toEqual({ phone: null, sections: { faq: false, stats: true } })
     expect(toPayload(values, { sections: {} })).toEqual({})
+  })
+})
+
+describe('launch countdown', () => {
+  it('will not let the countdown run without a moment to count to', () => {
+    // A switch on with no date does nothing on the site, which reads as a broken feature.
+    expect(issues({ launch_enabled: true, launch_at: '' })).toEqual([
+      'launch_at: Set the launch time for the countdown to run.',
+    ])
+    expect(issues({ launch_enabled: true, launch_at: '2026-09-25T11:11' })).toEqual([])
+    expect(issues({ launch_enabled: false, launch_at: '' })).toEqual([])
+  })
+
+  it('sends the moment as a real instant, not a wall clock', () => {
+    const payload = toPayload(
+      { ...empty, launch_enabled: true, launch_at: '2026-09-25T11:11' },
+      { launch_enabled: true, launch_at: true },
+    )
+    expect(payload.launch_enabled).toBe(true)
+    // What the admin typed is their local 11:11; what the API stores is that same instant in UTC.
+    expect(payload.launch_at).toBe(new Date('2026-09-25T11:11').toISOString())
+  })
+
+  it('clears the moment rather than sending an empty string', () => {
+    const payload = toPayload({ ...empty, launch_at: '' }, { launch_at: true })
+    expect(payload.launch_at).toBeNull()
+  })
+
+  it('leaves the launch fields out when they were not touched', () => {
+    expect(toPayload({ ...empty, launch_enabled: true }, { email: true })).toEqual({ email: null })
   })
 })

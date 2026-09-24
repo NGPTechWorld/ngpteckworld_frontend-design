@@ -6,29 +6,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#1A0F26" />
 
+    <!--
+      Everything between the og markers below is replaced per-request by api/share.js for
+      /team/:slug and /portfolio/:slug, so a shared link to one person or one project previews
+      with their own picture and text. The markers are load-bearing: do not rename or remove them.
+
+      Why a server function and not React: link previews are built by crawlers (WhatsApp,
+      Facebook, X, Telegram, LinkedIn) that fetch the HTML and never run JavaScript. Meta tags
+      written at runtime by a component are invisible to every one of them — which is why the
+      tags below are real HTML, and why the per-page ones are injected before the response is
+      sent rather than after the app boots.
+    -->
+    <!--og-->
     <title>NGP TechWorld — نبني مستقبلك الرقمي</title>
     <meta name="description" content="NGP TechWorld شركة برمجيات وحلول تقنية: تطوير مواقع وتطبيقات، تصميم UI/UX، أنظمة ERP/CRM، حلول سحابية وذكاء اصطناعي. نحوّل أفكارك إلى منتجات رقمية متكاملة." />
-    <meta name="author" content="NGP TechWorld" />
-    <link rel="canonical" href="https://ngpteckworld-frontend-design.vercel.app/" />
+    <link rel="canonical" href="https://ngptechworld.com/" />
 
-    <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="NGP TechWorld" />
     <meta property="og:title" content="NGP TechWorld — نبني مستقبلك الرقمي" />
     <meta property="og:description" content="شركة برمجيات وحلول تقنية — مواقع، تطبيقات، أنظمة، وذكاء اصطناعي." />
-    <meta property="og:url" content="https://ngpteckworld-frontend-design.vercel.app/" />
-    <meta property="og:image" content="https://ngpteckworld-frontend-design.vercel.app/assets/ngp-logo-white.png" />
+    <meta property="og:url" content="https://ngptechworld.com/" />
+    <meta property="og:image" content="https://ngptechworld.com/assets/og-cover.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="NGP TechWorld — نبني مستقبلك الرقمي" />
     <meta property="og:locale" content="ar_AR" />
     <meta property="og:locale:alternate" content="en_US" />
 
-    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="NGP TechWorld — نبني مستقبلك الرقمي" />
     <meta name="twitter:description" content="شركة برمجيات وحلول تقنية — مواقع، تطبيقات، أنظمة، وذكاء اصطناعي." />
-    <meta name="twitter:image" content="https://ngpteckworld-frontend-design.vercel.app/assets/ngp-logo-white.png" />
+    <meta name="twitter:image" content="https://ngptechworld.com/assets/og-cover.jpg" />
+    <!--/og-->
+
+    <meta name="author" content="NGP TechWorld" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- The API serves every image on the site; warming the connection saves a round trip on the
+         first card that renders. -->
+    <link rel="preconnect" href="https://api.ngptechworld.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Cairo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
     <script type="application/ld+json">
@@ -36,11 +55,24 @@
         "@context": "https://schema.org",
         "@type": "Organization",
         "name": "NGP TechWorld",
-        "url": "https://ngpteckworld-frontend-design.vercel.app/",
-        "logo": "https://ngpteckworld-frontend-design.vercel.app/assets/ngp-logo-white.png",
-        "description": "Software & tech solutions studio — websites, apps, systems and AI.",
+        "alternateName": "إن جي بي تك وورلد",
+        "url": "https://ngptechworld.com/",
+        "logo": "https://ngptechworld.com/assets/ngp-logo-white.png",
+        "image": "https://ngptechworld.com/assets/og-cover.jpg",
+        "slogan": "نبني مستقبلك الرقمي",
+        "description": "شركة برمجيات وحلول تقنية: تطوير مواقع وتطبيقات، تصميم UI/UX، أنظمة ERP/CRM، حلول سحابية وذكاء اصطناعي.",
         "email": "info@ngptechworld.com",
+        "address": { "@type": "PostalAddress", "addressLocality": "دمشق", "addressCountry": "SY" },
         "sameAs": []
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "NGP TechWorld",
+        "url": "https://ngptechworld.com/",
+        "inLanguage": ["ar", "en"]
       }
     </script>
   </head>
