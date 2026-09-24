@@ -693,3 +693,34 @@
 @media (prefers-reduced-motion: reduce) {
   .ngp-img__el { transition: none }
 }
+
+/* ── Language menu ─────────────────────────────────────────────────────────────
+   Anchored with a logical property rather than `right`, so the panel hangs off
+   the correct edge of its button in Arabic and in the nine left-to-right
+   languages without a second rule. */
+.ngp-langmenu {
+  inset-inline-end: 0;
+  border-color: var(--border);
+  background: rgba(30, 18, 44, .97);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 24px 50px -22px rgba(0, 0, 0, .7);
+  max-height: min(70vh, 420px);
+  overflow-y: auto;
+}
+
+.ngp-langmenu__item {
+  color: var(--soft);
+  background: transparent;
+  transition: background-color .18s ease, color .18s ease;
+}
+
+.ngp-langmenu__item:hover,
+.ngp-langmenu__item:focus-visible {
+  background: rgba(255, 255, 255, .06);
+  color: #fff;
+}
+
+.ngp-langmenu__item.is-active {
+  color: #fff;
+  background: rgba(150, 120, 190, .16);
+}

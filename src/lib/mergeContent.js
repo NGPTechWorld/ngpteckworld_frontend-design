@@ -1,4 +1,5 @@
 import { ui } from '../i18n/ui'
+import { DEFAULT_LANG, ownsContent } from '../i18n/languages'
 import { iconPaths } from './visuals'
 
 const has = (obj, key) => Object.prototype.hasOwnProperty.call(obj, key)
@@ -33,8 +34,17 @@ const COLLECTIONS = {
  * Pure: never mutates `ui` or `content`, never throws.
  */
 export function mergeContent(lang, content) {
-  const base = ui[lang] || ui.ar
-  if (!isObject(content)) return base
+  const base = ui[lang] || ui[DEFAULT_LANG]
+
+  // The overlay is skipped entirely for the European locales, and that is deliberate rather than
+  // an oversight. The dashboard stores these texts in Arabic and English only, and they are the
+  // thirty-nine most prominent strings on the site — the hero, every section heading, the whole
+  // About page, the footer. Falling back to their English would hand a German reader a German
+  // menu wrapped around an English page. The built-in German dictionary is the better answer.
+  //
+  // The cost is that editing those texts in the dashboard no longer reaches the eight European
+  // locales; ./locales/*.js has to be updated alongside. That is written down in docs/I18N.md.
+  if (!isObject(content) || !ownsContent(lang)) return base
 
   const merged = { ...base }
 

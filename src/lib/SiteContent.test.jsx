@@ -28,7 +28,7 @@ const content = {
 }
 
 function Probe() {
-  const { t, toggle } = useLang()
+  const { t, lang, setLang } = useLang()
   return (
     <div>
       <span data-testid="badge">{t.heroBadge}</span>
@@ -36,7 +36,8 @@ function Probe() {
       <span data-testid="rights">{t.footRights}</span>
       <span data-testid="steps">{t.processSteps.map((s) => s.t).join('|')}</span>
       <span data-testid="whyus">{t.whyus.map((s) => s.t).join('|')}</span>
-      <button onClick={toggle}>toggle</button>
+      <button onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}>toggle</button>
+      <button onClick={() => setLang('de')}>de</button>
     </div>
   )
 }
@@ -64,6 +65,9 @@ const snapshot = () => ({ badge: text('badge'), title: text('title'), rights: te
 const flush = () => act(() => new Promise((resolve) => setTimeout(resolve, 0)))
 
 beforeEach(() => {
+  // The chosen language is remembered now, so without this every test after the first one
+  // that switches language would start in that language rather than in Arabic.
+  localStorage.clear()
   api.getContent.mockReset()
 })
 
@@ -155,6 +159,18 @@ describe('ContentProvider + LanguageProvider', () => {
     unmount()
     await act(async () => { resolve(content) })
     expect(api.getContent).toHaveBeenCalledTimes(1)
+  })
+  test('a european locale keeps its own dictionary and ignores the dashboard content', async () => {
+    // End to end through the provider, not just mergeContent: German chrome must survive the
+    // arrival of the dashboard payload rather than being overwritten with its English.
+    api.getContent.mockResolvedValue(content)
+    renderProbe()
+    await screen.findByText('شارة من لوحة التحكم')
+
+    fireEvent.click(screen.getByText('de'))
+
+    expect(text('badge')).toBe(builtIn('de').badge)
+    expect(text('badge')).not.toBe('Badge from the dashboard')
   })
 })
 

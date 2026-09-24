@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLang } from '../i18n/LanguageContext'
 import LogoNova from './fx/LogoNova'
+import LanguageMenu from './LanguageMenu'
 
 /**
  * The pre-launch screen, shown instead of the site while the dashboard's countdown is running.
@@ -29,7 +30,7 @@ function remaining(target) {
 }
 
 export default function LaunchCountdown({ launchAt, onDone }) {
-  const { t, lang, setLang } = useLang()
+  const { t } = useLang()
   const target = useMemo(() => new Date(launchAt).getTime(), [launchAt])
   const [left, setLeft] = useState(() => remaining(target))
 
@@ -91,14 +92,9 @@ export default function LaunchCountdown({ launchAt, onDone }) {
 
         <div className="ngp-rule mx-auto mb-7 w-[140px]" />
 
-        <button
-          type="button"
-          onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}
-          className="rounded-full border px-4 py-2 text-[12.5px] text-soft transition-colors duration-300 hover:text-ink"
-          style={{ borderColor: 'rgba(150,120,190,.35)' }}
-        >
-          {t.langBtn}
-        </button>
+        <div className="flex justify-center pb-[260px]">
+          <LanguageMenu />
+        </div>
       </div>
     </div>
   )

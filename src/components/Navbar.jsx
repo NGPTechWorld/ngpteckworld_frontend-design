@@ -2,11 +2,12 @@ import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { useLang } from '../i18n/LanguageContext'
 import { useSections } from '../lib/SiteSettings'
+import LanguageMenu from './LanguageMenu'
 
 const linkClass = 'text-soft hover:text-white transition-colors text-[15px] cursor-pointer'
 
 export default function Navbar() {
-  const { t, toggle } = useLang()
+  const { t } = useLang()
   const [open, setOpen] = useState(false)
   const shown = useSections()
   const links = [
@@ -25,9 +26,7 @@ export default function Navbar() {
           ))}
         </div>
         <div data-navctrls className="flex items-center gap-3 sm:gap-4">
-          <button onClick={toggle} className="btn min-w-[42px] rounded-full border border-white/15 bg-transparent px-3 py-2 font-poppins text-[13px] font-semibold text-ink">
-            {t.langBtn}
-          </button>
+          <LanguageMenu />
           <Link to="/contact" data-navcta className="btn-p rounded-full bg-accent px-5 py-2.5 text-[14px] font-semibold text-white">
             {t.navCta}
           </Link>

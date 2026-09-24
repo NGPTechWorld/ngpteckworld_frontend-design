@@ -15,6 +15,8 @@ a{text-decoration:none;color:inherit}
 input,textarea,button{font-family:inherit}
 [dir="rtl"]{font-family:'Cairo',sans-serif}
 [dir="ltr"]{font-family:'Poppins','Cairo',sans-serif}
+/* Poppins has no Cyrillic; Montserrat is the nearest geometric sans that does. */
+html[lang="ru"] [dir="ltr"],html[lang="ru"] .font-poppins{font-family:'Montserrat','Poppins',sans-serif}
 /* burger hidden on desktop; shown on mobile via media query below */
 [data-burger]{display:none}
 @media (max-width:860px){
