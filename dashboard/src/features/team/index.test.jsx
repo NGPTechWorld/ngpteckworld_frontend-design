@@ -10,7 +10,7 @@ function Routed() {
   return useRoutes(feature.routes.map((route) => ({ ...route, path: `/${route.path}` })))
 }
 
-const emptyLists = { skills_ar: [], skills_en: [], education_ar: [], education_en: [], experience_ar: [], experience_en: [], certifications_ar: [], certifications_en: [], languages_ar: [], languages_en: [] }
+const emptyLists = { skills: [], experience: [], education: [], certifications: [], languages: [], social_links: [] }
 
 describe('team feature contract', () => {
   it('keeps its id and navigation entry (the sidebar and the router depend on them)', () => {
@@ -28,7 +28,7 @@ describe('team feature contract', () => {
           id: 5, slug: 'edit-me', name_ar: 'ع', name_en: 'Edit me', job_title_ar: 'م', job_title_en: 'Engineer',
           bio_ar: 'ب', bio_en: 'Bio', avatar: null, avatar_url: null, email: null, phone: null,
           location_ar: null, location_en: null, department_ar: null, department_en: null, years_experience: null,
-          linkedin_url: null, github_url: null, website_url: null, twitter_url: null, is_active: true, ...emptyLists,
+          is_active: true, ...emptyLists,
         },
       }),
     })

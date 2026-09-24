@@ -1,12 +1,15 @@
 import { useLang } from '../i18n/LanguageContext'
 import Icon from './Icon'
+import { dateRange } from '../lib/cv'
 
 /** One card of a team member's portfolio grid — the same fixed template for every item, opens the
  * full item in a modal (see PortfolioItemModal) instead of navigating to a separate page. */
 export default function PortfolioItemCard({ item, onOpen }) {
-  const { pick } = useLang()
+  const { pick, t } = useLang()
   const title = pick(item, 'title')
   const description = pick(item, 'description')
+  const subtitle = pick(item, 'subtitle')
+  const dates = dateRange(item.start_date, item.end_date, item.is_current, t.mPresent)
 
   return (
     <button type="button" onClick={onOpen}
@@ -19,7 +22,9 @@ export default function PortfolioItemCard({ item, onOpen }) {
         )}
       </div>
       <div className="p-[18px]">
-        <h4 className="mb-1.5 truncate text-[16px] font-semibold" dir="auto">{title}</h4>
+        <h4 className="mb-1 truncate text-[16px] font-semibold" dir="auto">{title}</h4>
+        {subtitle && <p className="mb-1 truncate text-[13px] italic text-[#D8CEE6]" dir="auto">{subtitle}</p>}
+        {dates && <p className="mb-1.5 text-[12.5px] text-faint" dir="ltr">{dates}</p>}
         <p className="line-clamp-2 text-[13.5px] leading-[1.6] text-muted" dir="auto">{description}</p>
       </div>
     </button>

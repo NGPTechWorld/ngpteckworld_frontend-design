@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { mockApi, paginated, reply, validationError } from '@/test/mockApi'
 import { renderWithProviders } from '@/test/renderWithProviders'
@@ -49,14 +49,14 @@ describe('PortfolioTab', () => {
     expect(await screen.findByText('Item 1')).toBeInTheDocument()
     expect(screen.getByText('عمل 1')).toBeInTheDocument()
     expect(screen.getByText('Item 2')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'New item' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'New project' })).toBeInTheDocument()
   })
 
   it('shows an empty state without items', async () => {
     mockApi({ 'GET /team/:id/portfolio': () => paginated([]) })
     renderWithProviders(<PortfolioTab teamId={5} />, { route: '/team/5' })
 
-    expect(await screen.findByText('No portfolio items yet')).toBeInTheDocument()
+    expect(await screen.findByText('No projects yet')).toBeInTheDocument()
   })
 
   it('creates an item and refreshes the list', async () => {
@@ -64,10 +64,10 @@ describe('PortfolioTab', () => {
     const { user } = renderWithProviders(<PortfolioTab teamId={5} />, { route: '/team/5' })
     await screen.findByText('Item 1')
 
-    await user.click(screen.getByRole('button', { name: 'New item' }))
-    const dialog = dialogOf('New item')
+    await user.click(screen.getByRole('button', { name: 'New project' }))
+    const dialog = dialogOf('New project')
     await user.type(dialog.getByLabelText('Title (Arabic)'), 'مشروع جديد')
-    await user.type(dialog.getByLabelText('Title (English)'), 'New project')
+    await user.type(dialog.getByLabelText('Title (English)'), 'Shiny app')
     await user.type(dialog.getByLabelText('Description (Arabic)'), 'وصف المشروع')
     await user.type(dialog.getByLabelText('Description (English)'), 'Project description')
 
@@ -75,12 +75,39 @@ describe('PortfolioTab', () => {
 
     await waitFor(() => expect(server.calls('POST', '/team/5/portfolio')).toHaveLength(1))
     expect(server.calls('POST', '/team/5/portfolio')[0].body).toMatchObject({
-      title_ar: 'مشروع جديد', title_en: 'New project', description_ar: 'وصف المشروع', description_en: 'Project description',
+      title_ar: 'مشروع جديد', title_en: 'Shiny app', description_ar: 'وصف المشروع', description_en: 'Project description',
       cover_image: null, gallery: [], video_url: null,
     })
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
     expect(await screen.findByText('Saved')).toBeInTheDocument()
-    expect(await screen.findByText('New project')).toBeInTheDocument()
+    expect(await screen.findByText('Shiny app')).toBeInTheDocument()
+  })
+
+  it('sends the subtitle, link and months, with no end date while the project is ongoing', async () => {
+    const server = portfolioServer()
+    const { user } = renderWithProviders(<PortfolioTab teamId={5} />, { route: '/team/5' })
+    await screen.findByText('Item 1')
+
+    await user.click(screen.getByRole('button', { name: 'New project' }))
+    const dialog = dialogOf('New project')
+    await user.type(dialog.getByLabelText('Title (Arabic)'), 'نظام محاسبة')
+    await user.type(dialog.getByLabelText('Title (English)'), 'Accounting system')
+    await user.type(dialog.getByLabelText('Subtitle (English)'), 'Flutter – GetX')
+    await user.type(dialog.getByLabelText('Description (Arabic)'), 'وصف')
+    await user.type(dialog.getByLabelText('Description (English)'), 'Description')
+    await user.type(dialog.getByLabelText('Project link'), 'https://example.com/app')
+    fireEvent.change(dialog.getByLabelText('Start date'), { target: { value: '2026-02' } })
+    fireEvent.change(dialog.getByLabelText('End date'), { target: { value: '2026-04' } })
+    await user.click(dialog.getByLabelText('Present'))
+    expect(dialog.getByLabelText('End date')).toBeDisabled()
+
+    await user.click(dialog.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => expect(server.calls('POST', '/team/5/portfolio')).toHaveLength(1))
+    expect(server.calls('POST', '/team/5/portfolio')[0].body).toMatchObject({
+      subtitle_ar: null, subtitle_en: 'Flutter – GetX', link_url: 'https://example.com/app',
+      start_date: '2026-02', end_date: null, is_current: true,
+    })
   })
 
   it('validates the required fields and sends nothing', async () => {
@@ -88,10 +115,10 @@ describe('PortfolioTab', () => {
     const { user } = renderWithProviders(<PortfolioTab teamId={5} />, { route: '/team/5' })
     await screen.findByText('Item 1')
 
-    await user.click(screen.getByRole('button', { name: 'New item' }))
-    await user.click(dialogOf('New item').getByRole('button', { name: 'Save' }))
+    await user.click(screen.getByRole('button', { name: 'New project' }))
+    await user.click(dialogOf('New project').getByRole('button', { name: 'Save' }))
 
-    expect(await dialogOf('New item').findAllByText('This field is required')).toHaveLength(4) // title + description × ar/en
+    expect(await dialogOf('New project').findAllByText('This field is required')).toHaveLength(4) // title + description × ar/en
     expect(server.calls('POST', '/team/5/portfolio')).toHaveLength(0)
   })
 
@@ -101,7 +128,7 @@ describe('PortfolioTab', () => {
     await screen.findByText('Item 1')
 
     await user.click(screen.getByRole('button', { name: 'Edit "Item 1"' }))
-    const dialog = dialogOf('Edit item')
+    const dialog = dialogOf('Edit project')
     expect(dialog.getByLabelText('Title (English)')).toHaveValue('Item 1')
 
     await user.clear(dialog.getByLabelText('Title (English)'))
@@ -118,8 +145,8 @@ describe('PortfolioTab', () => {
     portfolioServer({ extra: { 'POST /team/:id/portfolio': () => validationError({ title_en: ['That title is already used.'] }) } })
     const { user } = renderWithProviders(<PortfolioTab teamId={5} />, { route: '/team/5' })
     await screen.findByText('Item 1')
-    await user.click(screen.getByRole('button', { name: 'New item' }))
-    const dialog = dialogOf('New item')
+    await user.click(screen.getByRole('button', { name: 'New project' }))
+    const dialog = dialogOf('New project')
     await user.type(dialog.getByLabelText('Title (Arabic)'), 'مشروع')
     await user.type(dialog.getByLabelText('Title (English)'), 'Duplicate')
     await user.type(dialog.getByLabelText('Description (Arabic)'), 'وصف')
@@ -138,7 +165,7 @@ describe('PortfolioTab', () => {
     await screen.findByText('Item 1')
 
     await user.click(screen.getByRole('button', { name: 'Delete "Item 2"' }))
-    const dialog = screen.getByRole('dialog', { name: 'Delete item' })
+    const dialog = screen.getByRole('dialog', { name: 'Delete project' })
     expect(server.calls('DELETE')).toHaveLength(0)
 
     await user.click(within(dialog).getByRole('button', { name: 'Delete' }))

@@ -1,11 +1,11 @@
 import { useEffect, useId, useMemo, useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Briefcase, Pencil, Plus, Trash2 } from 'lucide-react'
 import { useCommon, useStrings } from '@/i18n'
 import { applyServerErrors } from '@/lib/applyServerErrors'
 import { errorText } from '@/lib/errors'
-import { Alert, BilingualField, Button, Card, EmptyState, Field, GalleryUpload, IconButton, ImageUpload, Input, Modal, SortableList, Spinner, useConfirm } from '@/ui'
+import { Alert, BilingualField, Button, Card, Checkbox, EmptyState, Field, GalleryUpload, IconButton, ImageUpload, Input, Modal, SortableList, Spinner, useConfirm } from '@/ui'
 import { useTeamPortfolio } from './hooks'
 import { emptyPortfolioItem, GALLERY_MAX, makePortfolioItemSchema, portfolioItemToFormValues, portfolioItemToPayload } from './portfolioSchema'
 import strings from './strings'
@@ -49,6 +49,7 @@ function ItemForm({ item, onSubmit, onUploadingChange }) {
     setError,
     formState: { errors },
   } = useForm({ resolver: zodResolver(schema), defaultValues: item ? portfolioItemToFormValues(item) : emptyPortfolioItem() })
+  const isCurrent = useWatch({ control, name: 'is_current' })
 
   useEffect(() => onUploadingChange?.(coverBusy || galleryBusy), [coverBusy, galleryBusy, onUploadingChange])
 
@@ -63,7 +64,27 @@ function ItemForm({ item, onSubmit, onUploadingChange }) {
   return (
     <form id={ITEM_FORM_ID} onSubmit={submit} noValidate className="space-y-5 pb-2">
       <BilingualField name="title" label={t.portfolioItemTitle} register={register} errors={errors} required maxLength={255} />
+      <BilingualField
+        name="subtitle" label={t.portfolioItemSubtitle} hint={t.portfolioItemSubtitleHint} register={register} errors={errors} maxLength={255}
+        placeholder={{ ar: 'Flutter – GetX – REST API', en: 'Flutter – GetX – REST API' }}
+      />
       <BilingualField name="description" label={t.portfolioItemDescription} register={register} errors={errors} required multiline rows={4} maxLength={5000} />
+      <div className="grid items-end gap-4 sm:grid-cols-3">
+        <Field label={t.cvStart} error={errors.start_date}>
+          <Input type="month" dir="ltr" {...register('start_date')} />
+        </Field>
+        <Field label={t.cvEnd} error={errors.end_date}>
+          <Input type="month" dir="ltr" {...register('end_date')} disabled={isCurrent} />
+        </Field>
+        <Controller
+          name="is_current"
+          control={control}
+          render={({ field }) => <Checkbox checked={field.value} onChange={field.onChange} label={t.cvCurrent} className="pb-3" />}
+        />
+      </div>
+      <Field label={t.portfolioItemLink} hint={t.portfolioItemLinkHint} error={errors.link_url}>
+        <Input type="url" dir="ltr" {...register('link_url')} placeholder="https://…" autoComplete="off" />
+      </Field>
       <Controller
         name="cover_image"
         control={control}

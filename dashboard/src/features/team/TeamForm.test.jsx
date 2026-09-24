@@ -1,11 +1,11 @@
-import { screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { mockApi, paginated, reply, validationError } from '@/test/mockApi'
 import { renderWithProviders } from '@/test/renderWithProviders'
 import TeamCreate from './TeamCreate'
 import TeamEdit from './TeamEdit'
 
-const emptyLists = { skills_ar: [], skills_en: [], education_ar: [], education_en: [], experience_ar: [], experience_en: [], certifications_ar: [], certifications_en: [], languages_ar: [], languages_en: [] }
+const emptyLists = { skills: [], experience: [], education: [], certifications: [], languages: [], social_links: [] }
 
 const profile = {
   id: 7,
@@ -18,10 +18,9 @@ const profile = {
   location_ar: null, location_en: null,
   department_ar: null, department_en: null,
   years_experience: 5,
-  linkedin_url: null, github_url: null, website_url: null, twitter_url: null,
   is_active: true,
   ...emptyLists,
-  skills_en: ['React'],
+  skills: [{ title_ar: 'رياكت', title_en: 'React', description_ar: null, description_en: null }],
 }
 
 const fillRequired = async (user) => {
@@ -40,7 +39,8 @@ describe('TeamCreate', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Add a team member' })).toBeInTheDocument()
     expect(screen.getByText('Personal information')).toBeInTheDocument()
     expect(screen.getByText('Work information')).toBeInTheDocument()
-    expect(screen.getByText('CV')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Skills' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Education' })).toBeInTheDocument()
     expect(screen.getByText('Links')).toBeInTheDocument()
     expect(screen.getByLabelText('Name (Arabic)')).toHaveAttribute('dir', 'rtl')
     expect(screen.getByLabelText('Name (English)')).toHaveAttribute('dir', 'ltr')
@@ -54,8 +54,6 @@ describe('TeamCreate', () => {
     expect(screen.getByLabelText('Name (English)')).toHaveAttribute('placeholder', 'Sara Ahmad')
     expect(screen.getByLabelText('Email')).toHaveAttribute('placeholder', 'sara@ngptechworld.com')
     expect(screen.getByLabelText('Phone')).toHaveAttribute('placeholder', '+963 933 000 111')
-    expect(screen.getByLabelText('Skills (Arabic)')).toHaveAttribute('placeholder', 'React')
-    expect(screen.getByLabelText('Education (English)')).toHaveAttribute('placeholder', 'BSc in Software Engineering — Damascus University, 2018')
   })
 
   it('validates the required fields locally and sends nothing', async () => {
@@ -78,20 +76,39 @@ describe('TeamCreate', () => {
     await waitFor(() => expect(screen.getByTestId('location')).toHaveTextContent(/^\/team$/))
     const body = server.calls('POST', '/team')[0].body
     expect(body).toMatchObject({ name_ar: 'سارة', name_en: 'Sara', job_title_en: 'Engineer', is_active: true, slug: null, email: null, years_experience: null })
-    expect(body.skills_ar).toEqual([])
-    expect(body.skills_en).toEqual([])
+    expect(body.skills).toEqual([])
+    expect(body.social_links).toEqual([])
   })
 
-  it('adds a skill tag and sends it in the payload', async () => {
+  it('adds structured entries and a social link and sends them in the payload', async () => {
     const server = mockApi({ 'POST /team': ({ body }) => reply(201, { data: { id: 9, ...body } }) })
     const { user } = renderWithProviders(<TeamCreate />, { route: '/team/new' })
 
     await fillRequired(user)
-    await user.type(screen.getByLabelText('Skills (English)'), 'React{Enter}')
+    await user.click(screen.getByRole('button', { name: 'Add skill' }))
+    expect(screen.getByLabelText('Skill (English)')).toHaveAttribute('placeholder', 'Flutter development')
+    await user.type(screen.getByLabelText('Skill (Arabic)'), 'رياكت')
+    await user.type(screen.getByLabelText('Skill (English)'), 'React')
+    await user.type(screen.getByLabelText('Description (English)'), 'Three years of React')
+    await user.click(screen.getByRole('button', { name: 'Add education' }))
+    await user.type(screen.getByLabelText('Degree / field (Arabic)'), 'بكالوريوس')
+    await user.type(screen.getByLabelText('Degree / field (English)'), 'Bachelor')
+    fireEvent.change(screen.getByLabelText('Start date'), { target: { value: '2022-10' } })
+    await user.click(screen.getByLabelText('Present'))
+    await user.click(screen.getByRole('button', { name: 'Add link' }))
+    await user.selectOptions(screen.getByLabelText('Platform'), 'other')
+    await user.type(screen.getByLabelText(/^URL/), 'https://sara.dev')
+    await user.type(screen.getByLabelText('Display name'), 'Blog')
     await user.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => expect(server.calls('POST', '/team')).toHaveLength(1))
-    expect(server.calls('POST', '/team')[0].body.skills_en).toEqual(['React'])
+    const body = server.calls('POST', '/team')[0].body
+    expect(body.skills).toEqual([{ title_ar: 'رياكت', title_en: 'React', description_ar: null, description_en: 'Three years of React' }])
+    expect(body.education).toEqual([{
+      degree_ar: 'بكالوريوس', degree_en: 'Bachelor', school_ar: null, school_en: null, location_ar: null, location_en: null,
+      description_ar: null, description_en: null, start: '2022-10', end: null, current: true,
+    }])
+    expect(body.social_links).toEqual([{ platform: 'other', url: 'https://sara.dev', label: 'Blog' }])
   })
 
   it('shows the server validation error on the matching field (e.g. a taken slug) and stays on the page', async () => {
@@ -115,8 +132,8 @@ describe('TeamEdit', () => {
     renderWithProviders(<TeamEdit />, { route, path })
 
     expect(await screen.findByLabelText('Name (English)')).toHaveValue('Sara Ahmad')
-    expect(screen.getByRole('heading', { name: 'Portfolio' })).toBeInTheDocument()
-    expect(await screen.findByText('No portfolio items yet')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Projects' })).toBeInTheDocument()
+    expect(await screen.findByText('No projects yet')).toBeInTheDocument()
   })
 
   it('loads the record into the form and keeps Save disabled until something changes', async () => {
@@ -125,7 +142,7 @@ describe('TeamEdit', () => {
 
     expect(await screen.findByLabelText('Name (English)')).toHaveValue('Sara Ahmad')
     expect(screen.getByLabelText('Job title (Arabic)')).toHaveValue('مهندسة برمجيات')
-    expect(screen.getByText('React')).toBeInTheDocument() // skill tag
+    expect(screen.getByLabelText('Skill (English)')).toHaveValue('React')
     expect(screen.getByRole('heading', { level: 1, name: 'Edit team member' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled()
 

@@ -79,6 +79,7 @@ export default {
     minLength: (n) => `الحد الأدنى ${n} أحرف`,
     invalidEmail: 'بريد إلكتروني غير صالح',
     invalidUrl: 'رابط غير صالح (يجب أن يبدأ بـ http:// أو https://)',
+    invalidMonth: 'اختر شهرًا صالحًا',
     invalidNumber: 'أدخل رقمًا صالحًا',
     numberRange: (min, max) => `يجب أن تكون القيمة بين ${min} و${max}`,
 
@@ -223,6 +224,7 @@ export default {
     minLength: (n) => `At least ${n} characters`,
     invalidEmail: 'Enter a valid email address',
     invalidUrl: 'Enter a valid URL (starting with http:// or https://)',
+    invalidMonth: 'Pick a valid month',
     invalidNumber: 'Enter a valid number',
     numberRange: (min, max) => `Must be between ${min} and ${max}`,
 

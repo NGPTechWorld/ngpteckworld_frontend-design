@@ -5,7 +5,9 @@ import { useAuth } from '@/app/AuthProvider'
 import { useCommon, useStrings } from '@/i18n'
 import { applyServerErrors } from '@/lib/applyServerErrors'
 import { users } from '@/features/users/hooks'
-import { BilingualField, BilingualTags, Card, Field, FormActions, ImageUpload, Input, Select, Switch } from '@/ui'
+import { BilingualField, Card, Field, FormActions, ImageUpload, Input, Select, Switch } from '@/ui'
+import { CvSectionEditor, SocialLinksEditor } from './CvEditors'
+import { CV_SECTION_KEYS } from './cvSections'
 import { emptyTeamProfile, makeTeamProfileSchema } from './schema'
 import strings from './strings'
 
@@ -14,17 +16,19 @@ import strings from './strings'
  * errors are put on the matching inputs; any other error already produced a toast (crud hook).
  * On edit forms `isEdit` keeps Save disabled until something changed. `avatarUrl` is the absolute URL of the
  * saved photo (`record.avatar_url`), used only for the preview; the form value is the relative path.
+ * `self`: a member editing their own profile ("My portfolio") — no slug / linked account / active switch, and
+ * Cancel just discards the changes instead of leaving for the team list.
  */
-export function TeamForm({ defaultValues = emptyTeamProfile, avatarUrl, onSubmit, saving = false, isEdit = false }) {
+export function TeamForm({ defaultValues = emptyTeamProfile, avatarUrl, onSubmit, saving = false, isEdit = false, self = false }) {
   const c = useCommon()
   const t = useStrings(strings)
-  const schema = useMemo(() => makeTeamProfileSchema(c), [c])
+  const schema = useMemo(() => makeTeamProfileSchema(c, { self }), [c, self])
   const [uploading, setUploading] = useState(false)
   // Linking a profile to a dashboard account is a super-admin-only capability (same gate as /users itself):
   // a limited admin with only the "team" permission cannot list accounts, so this field is hidden for them
   // instead of firing a request they are not allowed to make.
   const { user: currentUser } = useAuth()
-  const canLinkAccount = Boolean(currentUser?.is_super_admin)
+  const canLinkAccount = !self && Boolean(currentUser?.is_super_admin)
   const usersQuery = users.useList({ per_page: 200, sort: 'name' }, { enabled: canLinkAccount })
   const userOptions = useMemo(
     () => [{ value: '', label: t.linkedAccountNone }, ...usersQuery.rows.map((u) => ({ value: String(u.id), label: `${u.name} (${u.email})` }))],
@@ -35,6 +39,7 @@ export function TeamForm({ defaultValues = emptyTeamProfile, avatarUrl, onSubmit
     control,
     handleSubmit,
     setError,
+    reset,
     formState: { errors, isDirty },
   } = useForm({ resolver: zodResolver(schema), defaultValues })
 
@@ -87,39 +92,13 @@ export function TeamForm({ defaultValues = emptyTeamProfile, avatarUrl, onSubmit
         </div>
       </Card>
 
-      <Card title={t.sectionCv}>
-        <div className="space-y-6">
-          <BilingualTags name="skills" label={t.skills} hint={t.skillsHint} control={control} errors={errors} placeholder={{ ar: 'React', en: 'React' }} />
-          <BilingualTags
-            name="education" label={t.education} hint={t.educationHint} control={control} errors={errors}
-            placeholder={{ ar: 'بكالوريوس هندسة معلوماتية — جامعة دمشق، 2018', en: 'BSc in Software Engineering — Damascus University, 2018' }}
-          />
-          <BilingualTags
-            name="experience" label={t.experience} hint={t.experienceHint} control={control} errors={errors}
-            placeholder={{ ar: 'مطوّر واجهات أمامية — شركة X، 2019–2021', en: 'Frontend Developer — Company X, 2019–2021' }}
-          />
-          <BilingualTags name="certifications" label={t.certifications} control={control} errors={errors} placeholder={{ ar: 'AWS Certified Developer', en: 'AWS Certified Developer' }} />
-          <BilingualTags name="languages" label={t.languages} control={control} errors={errors} placeholder={{ ar: 'العربية', en: 'Arabic' }} />
-        </div>
-      </Card>
+      {CV_SECTION_KEYS.map((section) => (
+        <CvSectionEditor key={section} section={section} control={control} register={register} errors={errors} />
+      ))}
 
-      <Card title={t.sectionLinks}>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label={t.linkedin} error={errors.linkedin_url}>
-            <Input {...register('linkedin_url')} type="url" dir="ltr" maxLength={255} placeholder="https://linkedin.com/in/…" autoComplete="off" />
-          </Field>
-          <Field label={t.github} error={errors.github_url}>
-            <Input {...register('github_url')} type="url" dir="ltr" maxLength={255} placeholder="https://github.com/…" autoComplete="off" />
-          </Field>
-          <Field label={t.website} error={errors.website_url}>
-            <Input {...register('website_url')} type="url" dir="ltr" maxLength={255} placeholder="https://example.com" autoComplete="off" />
-          </Field>
-          <Field label={t.twitter} error={errors.twitter_url}>
-            <Input {...register('twitter_url')} type="url" dir="ltr" maxLength={255} placeholder="https://x.com/…" autoComplete="off" />
-          </Field>
-        </div>
-      </Card>
+      <SocialLinksEditor control={control} register={register} errors={errors} />
 
+      {self ? null : (
       <Card title={t.sectionStatus}>
         <div className="space-y-6">
           <Field label={t.slug} error={errors.slug} hint={t.slugHint}>
@@ -137,8 +116,13 @@ export function TeamForm({ defaultValues = emptyTeamProfile, avatarUrl, onSubmit
           />
         </div>
       </Card>
+      )}
 
-      <FormActions saving={saving} disabled={uploading} dirty={isEdit ? isDirty : undefined} cancelTo="/team" />
+      {self ? (
+        <FormActions saving={saving} disabled={uploading} dirty={isDirty} onCancel={isDirty ? () => reset() : undefined} cancelLabel={t.discard} />
+      ) : (
+        <FormActions saving={saving} disabled={uploading} dirty={isEdit ? isDirty : undefined} cancelTo="/team" />
+      )}
     </form>
   )
 }
