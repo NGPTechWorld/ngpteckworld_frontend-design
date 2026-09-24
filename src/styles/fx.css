@@ -483,3 +483,92 @@
   .ngp-logoswap ~ div,
   .ngp-logoswap + div { animation: none !important }
 }
+
+/* ---------- team cards ---------- */
+
+/*
+ * The one card on the site that grows rather than just lifting. It is a portrait: enlarging it
+ * is the natural "look closer" gesture, and there is a photograph to reward the look with.
+ *
+ * `scale` on the card and a second `scale` on the photo inside it are deliberate — the outer one
+ * moves the whole tile, the inner one pushes the image past the frame so the crop opens up. One
+ * transform alone gives a flat, sticker-like zoom.
+ */
+.ngp-team {
+  /* Its own origin: scaling from the centre in a grid makes neighbours look pushed aside. */
+  transform-origin: center;
+}
+.ngp-team:hover {
+  transform: translateY(-8px) scale(1.035);
+  z-index: 2;
+}
+
+.ngp-team__frame {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: linear-gradient(135deg, #6B4E8E, #301D3D);
+}
+
+.ngp-team__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Biased above centre: these are portraits, and a dead-centre square crop of a standing
+     figure cuts the head. Harmless on the occasional non-portrait upload. */
+  object-position: 50% 28%;
+  display: block;
+  /* Held slightly back by default so a row of photos taken on different cameras reads as one
+     set; released on hover, which doubles as the reward for pointing at it. */
+  filter: saturate(.72) contrast(1.04) brightness(.95);
+  transform: scale(1);
+  transition:
+    filter .6s cubic-bezier(.22, .75, .25, 1),
+    transform .8s cubic-bezier(.22, .75, .25, 1);
+}
+.ngp-team:hover .ngp-team__img {
+  filter: saturate(1.04) contrast(1) brightness(1);
+  transform: scale(1.09);
+}
+
+.ngp-team__scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(to top, rgba(26, 15, 38, .92) 0%, rgba(26, 15, 38, .25) 34%, transparent 62%),
+    linear-gradient(to bottom, rgba(26, 15, 38, .35), transparent 30%);
+  transition: opacity .5s ease;
+}
+.ngp-team:hover .ngp-team__scrim { opacity: .82 }
+
+/* The affordance: hidden until hover, then it rises into the bottom of the photo. */
+.ngp-team__cue {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--accent-lighter);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .45s ease, transform .45s cubic-bezier(.22, .75, .25, 1);
+  pointer-events: none;
+}
+.ngp-team:hover .ngp-team__cue { opacity: 1; transform: none }
+
+/* Arrows point along the reading direction, so it flips in Arabic. */
+[dir='rtl'] .ngp-team__arrow { transform: scaleX(-1) }
+
+@media (prefers-reduced-motion: reduce) {
+  .ngp-team:hover { transform: none }
+  .ngp-team__img,
+  .ngp-team:hover .ngp-team__img { transition: none; transform: none }
+  .ngp-team__cue { transition: none }
+}
