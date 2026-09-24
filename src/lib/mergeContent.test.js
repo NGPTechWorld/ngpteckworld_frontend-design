@@ -31,7 +31,34 @@ describe('without usable content', () => {
   })
 
   test('falls back to Arabic for an unknown language', () => {
-    expect(mergeContent('fr', null)).toBe(ui.ar)
+    expect(mergeContent('zz', null)).toBe(ui.ar)
+  })
+
+  test('a european locale renders from its own dictionary', () => {
+    expect(mergeContent('fr', null)).toBe(ui.fr)
+    expect(mergeContent('ru', null)).toBe(ui.ru)
+  })
+})
+
+describe('the dashboard overlay stops at the two languages it speaks', () => {
+  const texts = { heroBadge: { ar: 'شارة محدّثة', en: 'Updated badge' } }
+
+  test('arabic and english take the edit', () => {
+    expect(mergeContent('ar', { texts }).heroBadge).toBe('شارة محدّثة')
+    expect(mergeContent('en', { texts }).heroBadge).toBe('Updated badge')
+  })
+
+  test('a european locale keeps its own wording instead of borrowing the english', () => {
+    // Overlaying `en` here would put an English badge above a German headline. These thirty-nine
+    // texts are the most visible on the site, so a whole-page language is worth the staleness.
+    expect(mergeContent('de', { texts }).heroBadge).toBe(ui.de.heroBadge)
+    expect(mergeContent('de', { texts }).heroBadge).not.toBe('Updated badge')
+  })
+
+  test('nor does a european locale take the collections', () => {
+    const collections = { values: [{ title_ar: 'قيمة', title_en: 'Value', icon_key: 'quality' }] }
+    expect(mergeContent('en', { collections }).values).toHaveLength(1)
+    expect(mergeContent('it', { collections }).values).toBe(ui.it.values)
   })
 })
 
