@@ -99,13 +99,21 @@ export default function TeamMemberDetail() {
       <Link to="/team" className="mb-6 inline-flex items-center gap-2 text-[14px] text-accent-light">{t.mBack}</Link>
 
       <div className="mb-10 flex flex-wrap items-center gap-6">
-        <div className="flex h-[110px] w-[110px] shrink-0 items-center justify-center overflow-hidden rounded-full border border-[var(--border)]"
-          style={{ background: 'linear-gradient(135deg,#6B4E8E,#301D3D)' }}>
-          {member.avatar ? (
-            <img src={member.avatar} alt={name} className="h-full w-full object-cover" />
-          ) : (
-            <span className="font-poppins text-[30px] font-bold text-white/85">{initials(name)}</span>
-          )}
+        {/* Framed portrait: a slowly turning dashed ring, a gradient rim, and the NGP mark set
+            into the frame at the lower corner — the same badge the rest of the site is built
+            around, so a profile reads as belonging to the company rather than floating loose. */}
+        <div className="ngp-avatar shrink-0">
+          <span className="ngp-avatar__ring" aria-hidden="true" />
+          <div className="ngp-avatar__inner" style={{ background: 'linear-gradient(135deg,#6B4E8E,#301D3D)' }}>
+            {member.avatar ? (
+              <img src={member.avatar} alt={name} className="h-full w-full object-cover" style={{ objectPosition: '50% 28%' }} />
+            ) : (
+              <span className="font-poppins text-[clamp(30px,4.6vw,44px)] font-bold text-white/85">{initials(name)}</span>
+            )}
+          </div>
+          <span className="ngp-avatar__badge" aria-hidden="true">
+            <img src="/assets/ngp-mark-white.png" alt="" width="436" height="476" />
+          </span>
         </div>
         <div>
           <h1 className="mb-1.5 text-[36px] font-extrabold">{name}</h1>
@@ -142,9 +150,12 @@ export default function TeamMemberDetail() {
         <Section title={t.mSkills}>
           <div data-grid2 className="grid gap-x-10 gap-y-6" style={{ gridTemplateColumns: '1fr 1fr' }}>
             {skills.map((skill, i) => (
-              <div key={i}>
+              <div key={i} className="text-center">
                 <h3 className="text-[16.5px] font-bold" dir="auto">{pick(skill, 'title')}</h3>
-                {pick(skill, 'description') && <p className="mt-1 whitespace-pre-line text-[15px] leading-[1.75] text-soft" dir="auto">{pick(skill, 'description')}</p>}
+                {/* Short rule under the heading: centred text with nothing under it floats, and
+                    this also separates one skill from the next in a two-column list. */}
+                <div className="ngp-rule mx-auto mt-2 w-[54px]" />
+                {pick(skill, 'description') && <p className="mt-2.5 whitespace-pre-line text-[15px] leading-[1.75] text-soft" dir="auto">{pick(skill, 'description')}</p>}
               </div>
             ))}
           </div>

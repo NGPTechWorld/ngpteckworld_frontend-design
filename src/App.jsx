@@ -14,11 +14,17 @@ export default function App() {
       <SiteBackdrop />
       <ScrollFX />
       <ScrollToTop />
+      {/* Column layout with the page area growing: that is what keeps the footer on the bottom
+          edge of the viewport on a short page, instead of riding up under the content and
+          leaving a band of background beneath it. It also stops the footer jumping while a
+          lazily-loaded route is still resolving. */}
       <div className="ngp-app">
         <Navbar />
-        <Suspense fallback={<div style={{ minHeight: '60vh' }} />}>
-          <Outlet />
-        </Suspense>
+        <main className="ngp-main">
+          <Suspense fallback={<div style={{ minHeight: '50vh' }} />}>
+            <Outlet />
+          </Suspense>
+        </main>
         <Footer />
       </div>
     </div>

@@ -112,7 +112,21 @@
 }
 
 /* Everything the app renders sits above the backdrop. */
-.ngp-app { position: relative; z-index: 1 }
+.ngp-app {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  /* dvh first so the bar of mobile browser chrome does not count against the height and leave a
+     gap under the footer; vh above it as the fallback for anything that lacks dvh. */
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* The page area takes the slack, which is what pins the footer to the bottom on a short page.
+   `flex: 1 0 auto` rather than `flex: 1`: the latter is shorthand for a 0% basis, which makes
+   tall pages compute their height from the flex line instead of their own content. */
+.ngp-main { flex: 1 0 auto }
 
 /* ---------- entrance choreography ---------- */
 
@@ -571,4 +585,74 @@
   .ngp-team__img,
   .ngp-team:hover .ngp-team__img { transition: none; transform: none }
   .ngp-team__cue { transition: none }
+}
+
+/* ---------- framed profile portrait ---------- */
+
+.ngp-avatar {
+  /* One variable drives the portrait and everything hung off it, so the ring, rim and badge stay
+     in proportion at every size instead of needing three separate breakpoints. */
+  --avatar: clamp(140px, 19vw, 190px);
+  position: relative;
+  width: var(--avatar);
+  height: var(--avatar);
+}
+
+/* The outer ring sits *outside* the portrait rather than on it, so it never eats into the face.
+   Dashed and slowly turning — the same orbital language as the hero. */
+.ngp-avatar__ring {
+  position: absolute;
+  inset: calc(var(--avatar) * -0.075);
+  border-radius: 50%;
+  border: 1px dashed rgba(197, 178, 224, .34);
+  animation: ngpRot 44s linear infinite;
+}
+
+/* The gradient rim is a padded pseudo-element with mask-composite, for the same reason the cards
+   use one: border-image cannot follow a border-radius. */
+.ngp-avatar__inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+.ngp-avatar__inner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  padding: 2px;
+  background: linear-gradient(140deg, rgba(197, 178, 224, .85), rgba(107, 78, 142, .2) 48%, rgba(150, 120, 190, .7));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* The mark, set into the frame. Hexagonal to match the logo's own silhouette, and on the
+   trailing side so it never covers the face in either reading direction. */
+.ngp-avatar__badge {
+  position: absolute;
+  bottom: calc(var(--avatar) * -0.015);
+  inset-inline-end: calc(var(--avatar) * -0.03);
+  width: calc(var(--avatar) * 0.31);
+  height: calc(var(--avatar) * 0.345);
+  display: grid;
+  place-items: center;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background: linear-gradient(145deg, #7B5A9E, #3A2350);
+  box-shadow: 0 6px 18px -6px rgba(0, 0, 0, .7);
+}
+.ngp-avatar__badge img {
+  width: 62%;
+  height: auto;
+  filter: drop-shadow(0 0 6px rgba(197, 178, 224, .5));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ngp-avatar__ring { animation: none }
 }
