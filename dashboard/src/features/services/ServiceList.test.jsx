@@ -27,6 +27,7 @@ const makeService = (id, over = {}) => ({
   description_en: 'Description',
   features_ar: [],
   features_en: [],
+  is_active: true,
   order: id,
   created_at: '2026-09-01T10:00:00.000000Z',
   updated_at: '2026-09-01T10:00:00.000000Z',
@@ -289,6 +290,31 @@ describe('ServiceList', () => {
         const titles = within(screen.getByRole('list', { name: 'Services' })).getAllByRole('listitem').map((item) => within(item).getByText(/Service \d/).textContent)
         expect(titles).toEqual(['Service 1', 'Service 2', 'Service 3'])
       })
+    })
+  })
+
+  describe('active toggle', () => {
+    it('hides a service from the website with one click', async () => {
+      const server = listServer({ 'PUT /services/:id': ({ params, body }) => ({ data: { ...makeService(Number(params.id)), ...body } }) })
+      const { user } = renderWithProviders(<ServiceList />, { route: '/services' })
+      await screen.findByText('Service 1')
+
+      await user.click(screen.getByRole('switch', { name: 'Active: Service 1' }))
+
+      await waitFor(() => expect(server.calls('PUT', '/services/1')).toHaveLength(1))
+      expect(server.calls('PUT', '/services/1')[0].body).toEqual({ is_active: false })
+      expect(await screen.findByText('Saved')).toBeInTheDocument()
+    })
+
+    it('filters by status through the URL', async () => {
+      const server = listServer()
+      const { user } = renderWithProviders(<ServiceList />, { route: '/services' })
+      await screen.findByText('Service 1')
+
+      await user.selectOptions(screen.getByRole('combobox', { name: 'Status' }), '0')
+
+      await waitFor(() => expect(lastList(server).is_active).toBe('0'))
+      expect(screen.getByTestId('location')).toHaveTextContent('/services?is_active=0')
     })
   })
 })

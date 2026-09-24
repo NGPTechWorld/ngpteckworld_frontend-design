@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom'
 import { useLang } from '../i18n/LanguageContext'
-import { useSiteSettings } from '../lib/SiteSettings'
+import { useSections, useSiteSettings } from '../lib/SiteSettings'
 
 export default function Footer() {
   const { t } = useLang()
   const settings = useSiteSettings()
+  const shown = useSections()
   return (
     <footer className="mt-5 border-t border-[var(--border)]" style={{ background: 'rgba(0,0,0,.22)' }}>
       <div data-grid3 className="mx-auto grid max-w-site gap-[30px] px-[26px] pb-[30px] pt-[46px]" style={{ gridTemplateColumns: '1.4fr 1fr 1fr' }}>
@@ -16,10 +17,10 @@ export default function Footer() {
           <div className="mb-3.5 text-[15px] font-semibold">{t.footQuick}</div>
           <div className="flex flex-col gap-2.5 text-[14px] text-muted">
             <Link to="/" className="hover:text-white">{t.navHome}</Link>
-            <Link to="/services" className="hover:text-white">{t.navServices}</Link>
-            <Link to="/portfolio" className="hover:text-white">{t.navPortfolio}</Link>
-            <Link to="/team" className="hover:text-white">{t.navTeam}</Link>
-            <Link to="/about" className="hover:text-white">{t.navAbout}</Link>
+            {shown('services_page') && <Link to="/services" className="hover:text-white">{t.navServices}</Link>}
+            {shown('portfolio_page') && <Link to="/portfolio" className="hover:text-white">{t.navPortfolio}</Link>}
+            {shown('team_page') && <Link to="/team" className="hover:text-white">{t.navTeam}</Link>}
+            {shown('about_page') && <Link to="/about" className="hover:text-white">{t.navAbout}</Link>}
           </div>
         </div>
         <div>

@@ -1,16 +1,21 @@
 import { describe, expect, it } from 'vitest'
 import common from '@/i18n/common'
-import { FIELDS, SOCIALS, makeSettingsSchema, toFormValues, toPayload } from './schema'
+import { FIELDS, SECTIONS, SOCIALS, makeSettingsSchema, toFormValues, toPayload } from './schema'
 
 const schema = makeSettingsSchema(common.en)
-const empty = Object.fromEntries(FIELDS.map((key) => [key, '']))
+const allShown = Object.fromEntries(SECTIONS.map((key) => [key, true]))
+const empty = { ...Object.fromEntries(FIELDS.map((key) => [key, ''])), sections: allShown }
 const issues = (values) => (schema.safeParse({ ...empty, ...values }).error?.issues ?? []).map((issue) => `${issue.path.join('.')}: ${issue.message}`)
 
 describe('toFormValues', () => {
   it('turns null into empty strings and covers every field', () => {
     expect(toFormValues({ email: 'a@b.co', phone: null, facebook: null })).toEqual({ ...empty, email: 'a@b.co' })
     expect(toFormValues(undefined)).toEqual(empty)
-    expect(Object.keys(toFormValues({}))).toEqual(FIELDS)
+    expect(Object.keys(toFormValues({}))).toEqual([...FIELDS, 'sections'])
+  })
+
+  it('shows every section the API does not mention', () => {
+    expect(toFormValues({ sections: { faq: false, team_page: false } }).sections).toEqual({ ...allShown, faq: false, team_page: false })
   })
 })
 
@@ -46,5 +51,12 @@ describe('toPayload', () => {
     expect(toPayload(values, { phone: true, facebook: true })).toEqual({ phone: '+1 555', facebook: null })
     expect(toPayload(values, {})).toEqual({})
     expect(toPayload(values, { unknown: true })).toEqual({})
+  })
+
+  it('sends only the section switches that changed', () => {
+    const values = { ...empty, sections: { ...allShown, faq: false, partners: false } }
+    expect(toPayload(values, { sections: { faq: true } })).toEqual({ sections: { faq: false } })
+    expect(toPayload(values, { sections: { faq: true, stats: true }, phone: true })).toEqual({ phone: null, sections: { faq: false, stats: true } })
+    expect(toPayload(values, { sections: {} })).toEqual({})
   })
 })

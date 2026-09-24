@@ -10,6 +10,7 @@ export const emptyService = {
   description_en: '',
   features_ar: [],
   features_en: [],
+  is_active: true,
 }
 
 /**
@@ -26,6 +27,7 @@ export function makeServiceSchema(c) {
     description_en: requiredText(c, 5000),
     features_ar: z.array(feature),
     features_en: z.array(feature),
+    is_active: z.boolean(),
   })
 }
 
@@ -38,4 +40,5 @@ export const toFormValues = (service) => ({
   description_en: service.description_en,
   features_ar: [...(service.features_ar ?? [])],
   features_en: [...(service.features_en ?? [])],
+  is_active: service.is_active ?? true,
 })

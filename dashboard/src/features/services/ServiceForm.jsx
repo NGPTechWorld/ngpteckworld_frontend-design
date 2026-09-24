@@ -3,7 +3,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useCommon, useStrings } from '@/i18n'
 import { applyServerErrors } from '@/lib/applyServerErrors'
-import { BilingualField, BilingualTags, Card, FormActions } from '@/ui'
+import { BilingualField, BilingualTags, Card, FormActions, Switch } from '@/ui'
 import { IconPicker } from './IconPicker'
 import { emptyService, makeServiceSchema } from './schema'
 import strings from './strings'
@@ -47,6 +47,11 @@ export function ServiceForm({ defaultValues = emptyService, onSubmit, saving = f
           <BilingualField name="title" label={t.serviceTitle} register={register} errors={errors} required maxLength={255} />
           <BilingualField name="description" label={t.serviceDescription} register={register} errors={errors} required multiline rows={5} maxLength={5000} />
           <BilingualTags name="features" label={t.features} hint={t.featuresHint} control={control} errors={errors} />
+          <Controller
+            name="is_active"
+            control={control}
+            render={({ field }) => <Switch checked={field.value} onChange={field.onChange} label={t.activeLabel} description={t.activeHint} />}
+          />
         </div>
       </Card>
       <FormActions saving={saving} dirty={isEdit ? isDirty : undefined} cancelTo="/services" />

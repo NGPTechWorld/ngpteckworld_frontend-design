@@ -1,16 +1,18 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { useLang } from '../i18n/LanguageContext'
+import { useSections } from '../lib/SiteSettings'
 
 const linkClass = 'text-soft hover:text-white transition-colors text-[15px] cursor-pointer'
 
 export default function Navbar() {
   const { t, toggle } = useLang()
   const [open, setOpen] = useState(false)
+  const shown = useSections()
   const links = [
-    ['/', t.navHome], ['/services', t.navServices], ['/portfolio', t.navPortfolio],
-    ['/team', t.navTeam], ['/about', t.navAbout], ['/contact', t.navContact],
-  ]
+    ['/', t.navHome], ['/services', t.navServices, 'services_page'], ['/portfolio', t.navPortfolio, 'portfolio_page'],
+    ['/team', t.navTeam, 'team_page'], ['/about', t.navAbout, 'about_page'], ['/contact', t.navContact],
+  ].filter(([, , section]) => !section || shown(section))
   return (
     <nav className="sticky top-0 z-50 border-b border-[var(--border)]" style={{ backdropFilter: 'blur(16px)', background: 'rgba(26,15,38,.78)' }}>
       <div className="mx-auto flex max-w-site items-center gap-4 px-[18px] py-3.5 sm:gap-5 sm:px-[26px]">

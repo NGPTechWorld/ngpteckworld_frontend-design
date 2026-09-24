@@ -242,4 +242,20 @@ describe('SettingsPage', () => {
     renderWithProviders(<SettingsPage />, { route: '/settings', queryClient: first.queryClient })
     expect(await screen.findByLabelText('Phone number')).toHaveValue('+963 000')
   })
+
+  it('shows a switch per section and sends only the ones toggled', async () => {
+    const server = settingsServer({ 'GET /settings': () => ({ data: { ...settings, sections: { faq: false } } }) })
+    const { user } = renderWithProviders(<SettingsPage />, { route: '/settings' })
+
+    expect(await screen.findByRole('switch', { name: 'FAQ' })).not.toBeChecked()
+    expect(screen.getByRole('switch', { name: 'Testimonials' })).toBeChecked() // missing from the API = shown
+    expect(save()).toBeDisabled()
+
+    await user.click(screen.getByRole('switch', { name: 'Testimonials' }))
+    await user.click(screen.getByRole('switch', { name: 'Team page (and member pages)' }))
+    await user.click(save())
+
+    await waitFor(() => expect(server.calls('PUT', '/settings')).toHaveLength(1))
+    expect(server.calls('PUT', '/settings')[0].body).toEqual({ sections: { testimonials: false, team_page: false } })
+  })
 })

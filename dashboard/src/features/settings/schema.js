@@ -4,6 +4,13 @@ import { emptyToNull } from '@/lib/validation'
 export const SOCIALS = ['facebook', 'instagram', 'linkedin', 'x', 'whatsapp']
 export const FIELDS = ['email', 'phone', ...SOCIALS]
 
+/** Mirrors SiteSetting::SECTIONS, grouped the way the form shows them. A missing key means "shown". */
+export const SECTION_GROUPS = {
+  home: ['intro', 'stats', 'services', 'process', 'featured', 'promo', 'cta', 'testimonials', 'partners', 'faq'],
+  pages: ['services_page', 'portfolio_page', 'team_page', 'about_page'],
+}
+export const SECTIONS = [...SECTION_GROUPS.home, ...SECTION_GROUPS.pages]
+
 /** Shown as the placeholder and in the hint of each social field. */
 export const EXAMPLES = {
   facebook: 'https://facebook.com/your-page',
@@ -13,8 +20,11 @@ export const EXAMPLES = {
   whatsapp: 'https://wa.me/963XXXXXXXXX',
 }
 
-/** API record → form values (null → ''). */
-export const toFormValues = (settings) => Object.fromEntries(FIELDS.map((key) => [key, settings?.[key] ?? '']))
+/** API record → form values (null → ''; every section is a boolean, shown unless the API says otherwise). */
+export const toFormValues = (settings) => ({
+  ...Object.fromEntries(FIELDS.map((key) => [key, settings?.[key] ?? ''])),
+  sections: Object.fromEntries(SECTIONS.map((key) => [key, settings?.sections?.[key] ?? true])),
+})
 
 const optionalEmail = (c) =>
   z
@@ -36,6 +46,7 @@ export function makeSettingsSchema(c) {
     email: optionalEmail(c),
     phone: z.string().trim().max(40, c.maxLength(40)),
     ...Object.fromEntries(SOCIALS.map((key) => [key, optionalHttpUrl(c)])),
+    sections: z.object(Object.fromEntries(SECTIONS.map((key) => [key, z.boolean()]))),
   })
 }
 
@@ -48,5 +59,8 @@ export function toPayload(values, dirtyFields) {
   for (const key of FIELDS) {
     if (dirtyFields[key]) payload[key] = emptyToNull(values[key])
   }
+  // the API merges `sections` key by key too, so only the switches that changed are sent
+  const sections = SECTIONS.filter((key) => dirtyFields.sections?.[key])
+  if (sections.length) payload.sections = Object.fromEntries(sections.map((key) => [key, values.sections[key]]))
   return payload
 }

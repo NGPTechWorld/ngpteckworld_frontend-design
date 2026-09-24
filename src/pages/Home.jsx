@@ -4,6 +4,7 @@ import { api } from '../lib/api'
 import { pickFeatured } from '../lib/projects'
 import { useLang } from '../i18n/LanguageContext'
 import { useSpotlight } from '../lib/useSpotlight'
+import { useSections } from '../lib/SiteSettings'
 import Button from '../components/Button'
 import SectionHeader from '../components/SectionHeader'
 import ServiceCard from '../components/ServiceCard'
@@ -35,6 +36,7 @@ function StatCard({ stat }) {
 
 export default function Home() {
   const { t, pick } = useLang()
+  const shown = useSections()
   const [services, setServices] = useState([])
   const [featured, setFeatured] = useState([])
   const [stats, setStats] = useState(null)
@@ -89,7 +91,7 @@ export default function Home() {
 
             <div className="ngp-hero-item flex flex-wrap gap-3.5" style={{ '--i': 3 }}>
               <Button to="/contact">{t.heroCta1}</Button>
-              <Button to="/portfolio" variant="outline">{t.heroCta2}</Button>
+              {shown('portfolio_page') && <Button to="/portfolio" variant="outline">{t.heroCta2}</Button>}
             </div>
           </div>
 
@@ -105,14 +107,19 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Every section below can be switched off from the dashboard (Site settings → Website sections). */}
+
       {/* ================= INTRO ================= */}
+      {shown('intro') && (
       <section className="ngp-section relative pt-[clamp(24px,4vw,48px)] text-center" style={{ maxWidth: 900 }}>
         <p data-rise className="text-[clamp(17px,3vw,25px)] font-medium leading-[1.85]" style={{ color: '#D8CEE6' }}>
           {t.intro}
         </p>
       </section>
+      )}
 
       {/* ================= STATS ================= */}
+      {shown('stats') && (
       <section className="ngp-section">
         {/* auto-fit rather than a fixed column count: the dashboard decides how many stats there
             are, and a hard `lg:grid-cols-4` left a fifth one stranded alone on its own row. */}
@@ -124,18 +131,20 @@ export default function Home() {
           {statList.map((s, i) => <StatCard key={i} stat={s} />)}
         </div>
       </section>
+      )}
 
       {/* ================= SERVICES ================= */}
+      {shown('services') && (
       <section className="ngp-section">
         <SectionHeader
           kicker={t.servicesKick}
           title={t.servicesTitle}
           sub={t.servicesSub}
-          action={
+          action={shown('services_page') && (
             <Link to="/services" className="ngp-kicker shrink-0 pb-2 transition-opacity hover:opacity-70">
               {t.servicesAll}
             </Link>
-          }
+          )}
         />
         <div data-stagger className="grid gap-[18px] sm:grid-cols-2 lg:grid-cols-3">
           {loading.services
@@ -147,11 +156,14 @@ export default function Home() {
             ))}
         </div>
       </section>
+      )}
 
       {/* ================= PROCESS ================= */}
-      <ProcessSteps />
+      {shown('process') && <ProcessSteps />}
 
       {/* ================= FEATURED WORK ================= */}
+      {/* the cards open project pages, so the section also goes when the portfolio is hidden */}
+      {shown('featured') && shown('portfolio_page') && (
       <section className="ngp-section">
         <SectionHeader kicker={t.featuredKick} title={t.featuredTitle} />
         <div data-stagger className="grid gap-[18px] sm:grid-cols-2 lg:grid-cols-3">
@@ -164,8 +176,10 @@ export default function Home() {
             ))}
         </div>
       </section>
+      )}
 
       {/* ================= PROMO ================= */}
+      {shown('promo') && (
       <section className="ngp-section">
         <div className="ngp-card mx-auto w-full overflow-hidden" style={{ maxWidth: 1280 }}>
           <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9' }}>
@@ -195,14 +209,15 @@ export default function Home() {
           </div>
         </div>
       </section>
+      )}
 
       {/* The call to action sits here, straight after the work, rather than at the very bottom:
           it lands while the projects are still in mind, and the testimonials, partners and FAQ
           that follow go on answering the visitor who is not ready to act yet. */}
-      <CTASection />
-      <Testimonials />
-      <Partners />
-      <FaqAccordion />
+      {shown('cta') && <CTASection />}
+      {shown('testimonials') && <Testimonials />}
+      {shown('partners') && <Partners />}
+      {shown('faq') && <FaqAccordion />}
     </div>
   )
 }

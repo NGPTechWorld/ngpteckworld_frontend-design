@@ -20,6 +20,8 @@ export default {
     deleteMessage: (name) => `هل تريد حذف الخدمة «${name}»؟ لا يمكن التراجع عن ذلك.`,
     emptyTitle: 'لا توجد خدمات بعد',
     emptyHint: 'أضف أول خدمة لتظهر في الموقع.',
+    activeLabel: 'ظاهرة في الموقع',
+    activeHint: 'الخدمة المخفية لا تظهر في الموقع ولا في قائمة الخدمات في نموذج التواصل.',
     reorderIntro: 'اسحب الخدمات لتغيير ترتيب ظهورها في الموقع. يُحفظ الترتيب تلقائيًا.',
     icons: {
       web: 'مواقع الويب',
@@ -50,6 +52,8 @@ export default {
     deleteMessage: (name) => `Delete the service “${name}”? This cannot be undone.`,
     emptyTitle: 'No services yet',
     emptyHint: 'Add the first service so it shows on the website.',
+    activeLabel: 'Shown on the website',
+    activeHint: 'A hidden service is not shown on the website nor offered on the contact form.',
     reorderIntro: 'Drag the services to change the order they appear in on the website. The order is saved automatically.',
     icons: {
       web: 'Web',

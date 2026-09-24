@@ -77,6 +77,7 @@ describe('ServiceCreate', () => {
       description_en: 'A description',
       features_ar: ['ميزة أولى', 'ميزة ثانية'],
       features_en: ['First'],
+      is_active: true,
     })
     expect(await screen.findByText('Saved')).toBeInTheDocument()
   })
@@ -182,7 +183,7 @@ describe('ServiceCreate', () => {
 
 describe('service schema', () => {
   const c = { required: 'required', maxLength: (n) => `max ${n}` }
-  const valid = { icon_key: 'web', title_ar: 'ع', title_en: 'T', description_ar: 'و', description_en: 'D', features_ar: [], features_en: [] }
+  const valid = { icon_key: 'web', title_ar: 'ع', title_en: 'T', description_ar: 'و', description_en: 'D', features_ar: [], features_en: [], is_active: true }
 
   it('accepts exactly the seven icon keys of the API', () => {
     const schema = makeServiceSchema(c)
@@ -254,6 +255,7 @@ describe('ServiceEdit', () => {
       description_en: service.description_en,
       features_ar: ['ميزة ثانية'],
       features_en: ['First feature', 'Second feature'],
+      is_active: true,
     })
   })
 

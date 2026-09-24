@@ -3,7 +3,7 @@ import { ListOrdered, Pencil, Plus, Trash2 } from 'lucide-react'
 import { useCommon, useFormat, useLanguage, useStrings } from '@/i18n'
 import { errorText } from '@/lib/errors'
 import { useListParams } from '@/lib/useListParams'
-import { Alert, Button, Card, DataTable, PageHeader, Pagination, SearchInput, SortableList, useConfirm } from '@/ui'
+import { Alert, Button, Card, DataTable, PageHeader, Pagination, SearchInput, Select, SortableList, StatusBadge, Switch, useConfirm } from '@/ui'
 import { services } from './hooks'
 import { ServiceIcon } from './icons'
 import strings from './strings'
@@ -32,8 +32,12 @@ export default function ServiceList() {
   const list = useListParams(DEFAULTS)
   const query = services.useList(reordering ? REORDER_PARAMS : list.params)
   const { rows, meta } = query
+  const update = services.useUpdate()
   const remove = services.useDelete()
   const reorder = services.useReorder()
+
+  // while the toggle request is running show the value the user asked for
+  const activeOf = (row) => (update.isPending && update.variables?.id === row.id ? update.variables.data.is_active : row.is_active)
 
   const canReorder = !meta || meta.total <= REORDER_LIMIT
   const otherLang = lang === 'ar' ? 'en' : 'ar'
@@ -76,6 +80,12 @@ export default function ServiceList() {
     // the API cannot sort by the number of features, so this column is not sortable
     { key: 'features', header: t.features, hideBelow: 'sm', cell: (row) => <span className="tabular-nums">{f.number(featureCount(row))}</span> },
     { key: 'created_at', header: c.createdAt, sortable: true, hideBelow: 'md', cell: (row) => f.date(row.created_at) },
+    {
+      key: 'is_active',
+      header: c.status,
+      sortable: true,
+      cell: (row) => <Switch checked={Boolean(activeOf(row))} onChange={(is_active) => update.mutate({ id: row.id, data: { is_active } })} aria-label={`${c.active}: ${pickField(row, 'title')}`} />,
+    },
   ]
 
   const rowActions = (row) => [
@@ -126,6 +136,7 @@ export default function ServiceList() {
                 <span className="w-7 text-center text-sm font-bold tabular-nums text-muted">{f.number(index + 1)}</span>
                 <IconTile name={row.icon_key} label={iconLabel(row.icon_key)} />
                 <p className="min-w-0 flex-1 truncate text-sm font-semibold">{pickField(row, 'title')}</p>
+                <StatusBadge active={row.is_active} />
               </div>
             )}
           />
@@ -134,6 +145,17 @@ export default function ServiceList() {
         <div className="space-y-4">
           <div className="flex flex-wrap items-center gap-3">
             <SearchInput value={list.params.search ?? ''} onChange={(search) => list.set({ search })} placeholder={t.searchPlaceholder} />
+            <Select
+              aria-label={c.status}
+              value={list.params.is_active ?? ''}
+              onChange={(event) => list.set({ is_active: event.target.value })}
+              options={[
+                { value: '', label: `${c.status}: ${c.all}` },
+                { value: '1', label: c.active },
+                { value: '0', label: c.inactive },
+              ]}
+              wrapperClassName="w-full sm:w-52"
+            />
             {list.hasFilters ? (
               <Button variant="ghost" size="sm" onClick={list.reset}>
                 {c.reset}

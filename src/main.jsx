@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { LanguageProvider } from './i18n/LanguageContext'
 import { ContentProvider } from './lib/SiteContent'
-import { SiteSettingsProvider } from './lib/SiteSettings'
+import { SectionGate, SiteSettingsProvider } from './lib/SiteSettings'
 import App from './App'
 import './index.css'
 
@@ -18,15 +18,18 @@ const About = lazy(() => import('./pages/About'))
 const Contact = lazy(() => import('./pages/Contact'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
+// Pages the dashboard can switch off (Site settings → Website sections): hidden ones answer as 404.
+const gated = (section, page) => <SectionGate section={section} fallback={<NotFound />}>{page}</SectionGate>
+
 const router = createBrowserRouter([
   { path: '/', element: <App />, children: [
     { index: true, element: <Home /> },
-    { path: 'services', element: <Services /> },
-    { path: 'portfolio', element: <Portfolio /> },
-    { path: 'portfolio/:slug', element: <ProjectDetail /> },
-    { path: 'team', element: <Team /> },
-    { path: 'team/:slug', element: <TeamMemberDetail /> },
-    { path: 'about', element: <About /> },
+    { path: 'services', element: gated('services_page', <Services />) },
+    { path: 'portfolio', element: gated('portfolio_page', <Portfolio />) },
+    { path: 'portfolio/:slug', element: gated('portfolio_page', <ProjectDetail />) },
+    { path: 'team', element: gated('team_page', <Team />) },
+    { path: 'team/:slug', element: gated('team_page', <TeamMemberDetail />) },
+    { path: 'about', element: gated('about_page', <About />) },
     { path: 'contact', element: <Contact /> },
     { path: '*', element: <NotFound /> },
   ]},

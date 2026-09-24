@@ -1,11 +1,11 @@
 import { useMemo } from 'react'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link2, Mail, MessageCircle, Phone } from 'lucide-react'
 import { useCommon, useStrings } from '@/i18n'
 import { applyServerErrors } from '@/lib/applyServerErrors'
-import { Alert, Card, Field, FormActions, Input } from '@/ui'
-import { EXAMPLES, SOCIALS, makeSettingsSchema, toFormValues, toPayload } from './schema'
+import { Alert, Card, Field, FormActions, Input, Switch } from '@/ui'
+import { EXAMPLES, SECTION_GROUPS, SOCIALS, makeSettingsSchema, toFormValues, toPayload } from './schema'
 import strings from './strings'
 
 /**
@@ -19,6 +19,7 @@ export function SettingsForm({ defaultValues, onSubmit, saving = false }) {
   const schema = useMemo(() => makeSettingsSchema(c), [c])
   const {
     register,
+    control,
     handleSubmit,
     reset,
     setError,
@@ -67,6 +68,30 @@ export function SettingsForm({ defaultValues, onSubmit, saving = false }) {
             >
               <Input type="url" autoComplete="off" startIcon={key === 'whatsapp' ? MessageCircle : Link2} placeholder={EXAMPLES[key]} {...register(key)} />
             </Field>
+          ))}
+        </div>
+      </Card>
+
+      <Card title={t.sectionsTitle} description={t.sectionsDescription}>
+        <div className="space-y-6">
+          {[
+            ['home', t.sectionsHome, null],
+            ['pages', t.sectionsPages, t.sectionsPagesHint],
+          ].map(([group, heading, hint]) => (
+            <fieldset key={group}>
+              <legend className="mb-1 text-sm font-semibold text-ink">{heading}</legend>
+              {hint ? <p className="text-xs text-muted">{hint}</p> : null}
+              <div className="mt-3 grid gap-4 sm:grid-cols-2">
+                {SECTION_GROUPS[group].map((key) => (
+                  <Controller
+                    key={key}
+                    name={`sections.${key}`}
+                    control={control}
+                    render={({ field }) => <Switch checked={field.value} onChange={field.onChange} label={t.sections[key]} />}
+                  />
+                ))}
+              </div>
+            </fieldset>
           ))}
         </div>
       </Card>
