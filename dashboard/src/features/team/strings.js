@@ -16,6 +16,7 @@ export default {
     sectionWork: 'معلومات العمل',
     sectionLinks: 'روابط التواصل',
     sectionStatus: 'الحالة والرابط',
+    sectionAddress: 'رابط صفحتك',
 
     name: 'الاسم',
     avatar: 'الصورة الشخصية',
@@ -146,6 +147,7 @@ export default {
     sectionWork: 'Work information',
     sectionLinks: 'Links',
     sectionStatus: 'Status & URL',
+    sectionAddress: 'Your page URL',
 
     name: 'Name',
     avatar: 'Photo',

@@ -2,8 +2,14 @@ import { z } from 'zod'
 import { emptyToNull, intField, optionalText, requiredText } from '@/lib/validation'
 import { listsToForm, listsToPayload, makeListsShape } from './cvSections'
 
-/** Fields only the team admins manage; the member editing their own profile ("My portfolio") never sees them. */
-export const ADMIN_ONLY_FIELDS = ['slug', 'user_id', 'is_active']
+/**
+ * Fields only the team admins manage; the member editing their own profile ("My portfolio") never sees them.
+ *
+ * The slug is deliberately not here — it is the address of the member's own page and affects nobody else,
+ * so they set it themselves. `user_id` is the privilege boundary (who owns the profile), and `is_active`
+ * is the company's decision about who appears on the site; neither is one member's to change.
+ */
+export const ADMIN_ONLY_FIELDS = ['user_id', 'is_active']
 
 export const emptyTeamProfile = {
   slug: '',

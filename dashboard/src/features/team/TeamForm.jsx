@@ -16,7 +16,8 @@ import strings from './strings'
  * errors are put on the matching inputs; any other error already produced a toast (crud hook).
  * On edit forms `isEdit` keeps Save disabled until something changed. `avatarUrl` is the absolute URL of the
  * saved photo (`record.avatar_url`), used only for the preview; the form value is the relative path.
- * `self`: a member editing their own profile ("My portfolio") — no slug / linked account / active switch, and
+ * `self`: a member editing their own profile ("My portfolio") — keeps the slug, drops the linked account
+ * and the active switch, and
  * Cancel just discards the changes instead of leaving for the team list.
  */
 export function TeamForm({ defaultValues = emptyTeamProfile, avatarUrl, onSubmit, saving = false, isEdit = false, self = false }) {
@@ -98,25 +99,27 @@ export function TeamForm({ defaultValues = emptyTeamProfile, avatarUrl, onSubmit
 
       <SocialLinksEditor control={control} register={register} errors={errors} />
 
-      {self ? null : (
-      <Card title={t.sectionStatus}>
+      {/* The slug shows in both modes — it is the member's own page address. The linked account and
+          the active switch stay with the team admins, so in `self` mode this card holds the slug alone. */}
+      <Card title={self ? t.sectionAddress : t.sectionStatus}>
         <div className="space-y-6">
           <Field label={t.slug} error={errors.slug} hint={t.slugHint}>
             <Input {...register('slug')} dir="ltr" maxLength={255} placeholder="sara-ahmad" autoComplete="off" />
           </Field>
-          {canLinkAccount ? (
+          {!self && canLinkAccount ? (
             <Field label={t.linkedAccount} error={errors.user_id} hint={t.linkedAccountHint}>
               <Select {...register('user_id')} options={userOptions} />
             </Field>
           ) : null}
-          <Controller
-            name="is_active"
-            control={control}
-            render={({ field }) => <Switch checked={field.value} onChange={field.onChange} label={t.activeLabel} description={t.activeHint} />}
-          />
+          {self ? null : (
+            <Controller
+              name="is_active"
+              control={control}
+              render={({ field }) => <Switch checked={field.value} onChange={field.onChange} label={t.activeLabel} description={t.activeHint} />}
+            />
+          )}
         </div>
       </Card>
-      )}
 
       {self ? (
         <FormActions saving={saving} disabled={uploading} dirty={isDirty} onCancel={isDirty ? () => reset() : undefined} cancelLabel={t.discard} />

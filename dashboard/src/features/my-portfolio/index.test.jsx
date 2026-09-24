@@ -39,7 +39,7 @@ describe('my-portfolio feature contract', () => {
 })
 
 describe('MyPortfolioPage', () => {
-  it('opens on the own profile, without the fields only team admins manage', async () => {
+  it('opens on the own profile: the slug included, the admin-only fields not', async () => {
     myProfileServer()
     renderWithProviders(<MyPortfolioPage />, { authUser: linkedUser })
 
@@ -47,7 +47,10 @@ describe('MyPortfolioPage', () => {
     expect(await screen.findByLabelText('Name (English)')).toHaveValue('Sara')
     expect(screen.getByLabelText('Skill (English)')).toHaveValue('Flutter')
     expect(screen.getByLabelText(/^URL/)).toHaveValue('https://github.com/sara')
-    expect(screen.queryByLabelText('Slug')).not.toBeInTheDocument()
+    // The slug is theirs: it addresses their own page.
+    expect(screen.getByLabelText('Slug')).toHaveValue('sara')
+    // Ownership and publication are not: no linked-account picker, no Active switch.
+    expect(screen.queryByLabelText(/Linked account/i)).not.toBeInTheDocument()
     expect(screen.queryByRole('switch', { name: /Active/ })).not.toBeInTheDocument()
   })
 
@@ -66,7 +69,9 @@ describe('MyPortfolioPage', () => {
     const body = server.calls('PUT', '/my-profile')[0].body
     expect(body.languages).toEqual([{ name_ar: 'الإنجليزية', name_en: 'English', level_ar: null, level_en: 'B1' }])
     expect(body.skills).toEqual(profile.skills)
-    expect(body).not.toHaveProperty('slug')
+    // The slug IS the member's to set — it addresses their own page and nobody else's. What stays
+    // with the admins is who owns the profile and whether it is published at all.
+    expect(body).toHaveProperty('slug')
     expect(body).not.toHaveProperty('is_active')
     expect(body).not.toHaveProperty('user_id')
     expect(await screen.findByText('Saved')).toBeInTheDocument()
