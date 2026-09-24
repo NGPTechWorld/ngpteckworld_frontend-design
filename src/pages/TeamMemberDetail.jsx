@@ -4,6 +4,7 @@ import { useLang } from '../i18n/LanguageContext'
 import { api } from '../lib/api'
 import Icon from '../components/Icon'
 import PageTitle from '../components/PageTitle'
+import SmartImage from '../components/fx/SmartImage'
 import PortfolioItemCard from '../components/PortfolioItemCard'
 import PortfolioItemModal from '../components/PortfolioItemModal'
 import { initials } from '../lib/visuals'
@@ -106,7 +107,14 @@ export default function TeamMemberDetail() {
           <span className="ngp-avatar__ring" aria-hidden="true" />
           <div className="ngp-avatar__inner" style={{ background: 'linear-gradient(135deg,#6B4E8E,#301D3D)' }}>
             {member.avatar ? (
-              <img src={member.avatar} alt={name} className="h-full w-full object-cover" style={{ objectPosition: '50% 28%' }} />
+              <SmartImage
+                src={member.avatar}
+                alt={name}
+                className="absolute inset-0"
+                objectPosition="50% 28%"
+                eager
+                fallback={<span className="font-poppins text-[clamp(30px,4.6vw,44px)] font-bold text-white/85">{initials(name)}</span>}
+              />
             ) : (
               <span className="font-poppins text-[clamp(30px,4.6vw,44px)] font-bold text-white/85">{initials(name)}</span>
             )}

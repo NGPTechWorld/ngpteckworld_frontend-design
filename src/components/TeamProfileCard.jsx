@@ -2,12 +2,23 @@ import { Link } from 'react-router-dom'
 import { useLang } from '../i18n/LanguageContext'
 import { initials } from '../lib/visuals'
 import { useSpotlight } from '../lib/useSpotlight'
+import SmartImage from './fx/SmartImage'
 
 export default function TeamProfileCard({ member }) {
   const { pick, t } = useLang()
   const spot = useSpotlight()
   const name = pick(member, 'name')
   const role = pick(member, 'job_title')
+
+  // Doubles as SmartImage's fallback, so a broken upload lands on the same panel as no upload.
+  const initialsPanel = (
+    <div
+      className="ngp-team__img absolute inset-0 grid place-items-center"
+      style={{ background: 'linear-gradient(135deg,#6B4E8E,#301D3D)' }}
+    >
+      <span className="font-poppins text-[42px] font-bold text-white/85">{initials(name)}</span>
+    </div>
+  )
 
   return (
     <Link
@@ -24,21 +35,14 @@ export default function TeamProfileCard({ member }) {
           means a row of cards lines up whatever it is given. */}
       <div className="ngp-team__frame">
         {member.avatar ? (
-          <img
+          <SmartImage
             src={member.avatar}
-            alt=""
-            loading="lazy"
-            decoding="async"
-            className="ngp-team__img"
+            className="absolute inset-0"
+            imgClassName="ngp-team__img"
+            objectPosition="50% 28%"
+            fallback={initialsPanel}
           />
-        ) : (
-          <div
-            className="ngp-team__img grid place-items-center"
-            style={{ background: 'linear-gradient(135deg,#6B4E8E,#301D3D)' }}
-          >
-            <span className="font-poppins text-[42px] font-bold text-white/85">{initials(name)}</span>
-          </div>
-        )}
+        ) : initialsPanel}
 
         {/* Scrim: photos come in at every exposure, and without it a bright one leaves the card's
             top edge glaring against the dark page while a dark one disappears into it. */}

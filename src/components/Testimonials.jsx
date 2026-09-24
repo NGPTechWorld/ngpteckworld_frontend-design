@@ -5,6 +5,7 @@ import { api } from '../lib/api'
 import { initials } from '../lib/visuals'
 import { useSpotlight } from '../lib/useSpotlight'
 import { Skeleton } from './fx/Skeleton'
+import SmartImage from './fx/SmartImage'
 
 function Stars({ n = 5 }) {
   return (
@@ -39,7 +40,7 @@ function Card({ item }) {
 
       <div className="flex items-center gap-3 border-t border-white/[.07] pt-5">
         {item.avatar
-          ? <img src={item.avatar} alt="" className="h-[42px] w-[42px] shrink-0 rounded-full object-cover" />
+          ? <SmartImage src={item.avatar} className="h-[42px] w-[42px] shrink-0 rounded-full" />
           : (
             <div
               className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full font-poppins text-[14px] font-bold text-white"

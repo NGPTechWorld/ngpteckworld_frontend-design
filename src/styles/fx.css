@@ -524,7 +524,11 @@
   background: linear-gradient(135deg, #6B4E8E, #301D3D);
 }
 
-.ngp-team__img {
+/* Scoped to the frame so this beats `.ngp-img__el`, which is declared later in the file and
+   would otherwise replace this whole `transition` list with its own opacity-only one — taking
+   the hover zoom with it. `opacity` is included here for the same reason: SmartImage fades the
+   photo in, and that fade has to survive this rule. */
+.ngp-team__frame .ngp-team__img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -538,9 +542,10 @@
   transform: scale(1);
   transition:
     filter .6s cubic-bezier(.22, .75, .25, 1),
-    transform .8s cubic-bezier(.22, .75, .25, 1);
+    transform .8s cubic-bezier(.22, .75, .25, 1),
+    opacity .55s cubic-bezier(.22, .75, .25, 1);
 }
-.ngp-team:hover .ngp-team__img {
+.ngp-team:hover .ngp-team__frame .ngp-team__img {
   filter: saturate(1.04) contrast(1) brightness(1);
   transform: scale(1.09);
 }
@@ -582,8 +587,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .ngp-team:hover { transform: none }
-  .ngp-team__img,
-  .ngp-team:hover .ngp-team__img { transition: none; transform: none }
+  .ngp-team__frame .ngp-team__img,
+  .ngp-team:hover .ngp-team__frame .ngp-team__img { transition: none; transform: none }
   .ngp-team__cue { transition: none }
 }
 
@@ -655,4 +660,36 @@
 
 @media (prefers-reduced-motion: reduce) {
   .ngp-avatar__ring { animation: none }
+}
+
+/* ---------- images ---------- */
+
+.ngp-img {
+  position: relative;
+  overflow: hidden;
+  /* Its own stacking context, so the shimmer cannot escape a rounded corner on the parent. */
+  isolation: isolate;
+}
+
+/* Sits under the image rather than beside it, so the fade-in crosses over the shimmer instead of
+   swapping one element for another. */
+.ngp-img__skel {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.ngp-img__el {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* `opacity` itself is set inline by SmartImage — see the note there. This only says how it
+     should move when it changes. */
+  transition: opacity .55s cubic-bezier(.22, .75, .25, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ngp-img__el { transition: none }
 }
