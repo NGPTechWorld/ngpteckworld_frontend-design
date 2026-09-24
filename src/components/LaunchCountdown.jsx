@@ -92,8 +92,8 @@ export default function LaunchCountdown({ launchAt, onDone }) {
 
         <div className="ngp-rule mx-auto mb-7 w-[140px]" />
 
-        <div className="flex justify-center pb-[260px]">
-          <LanguageMenu />
+        <div className="flex justify-center">
+          <LanguageMenu placement="up" />
         </div>
       </div>
     </div>

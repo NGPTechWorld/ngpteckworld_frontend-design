@@ -8,8 +8,11 @@ import { useLang } from '../i18n/LanguageContext'
  * languages rather than two. Each option is written in its own language — a German visitor is
  * looking for the word "Deutsch", not for "German" spelled out in Arabic — which is also why the
  * list is not translated along with the rest of the interface.
+ *
+ * `placement` exists for the countdown screen, where the switcher is the last thing on a
+ * vertically centred page and a list dropping below it would open past the bottom of the viewport.
  */
-export default function LanguageMenu({ className = '' }) {
+export default function LanguageMenu({ className = '', placement = 'down' }) {
   const { lang, languages, setLang } = useLang()
   const [open, setOpen] = useState(false)
   const boxRef = useRef(null)
@@ -56,7 +59,9 @@ export default function LanguageMenu({ className = '' }) {
           id={listId}
           role="listbox"
           aria-label="Language"
-          className="ngp-langmenu absolute z-50 mt-2 min-w-[168px] overflow-hidden rounded-2xl border py-1.5"
+          className={`ngp-langmenu absolute z-50 min-w-[168px] overflow-hidden rounded-2xl border py-1.5 ${
+            placement === 'up' ? 'bottom-full mb-2' : 'top-full mt-2'
+          }`}
         >
           {languages.map((l) => {
             const active = l.code === lang
