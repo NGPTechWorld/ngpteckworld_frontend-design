@@ -24,12 +24,12 @@ const gated = (section, page) => <SectionGate section={section} fallback={<NotFo
 const router = createBrowserRouter([
   { path: '/', element: <App />, children: [
     { index: true, element: <Home /> },
-    { path: 'services', element: gated('services_page', <Services />) },
-    { path: 'portfolio', element: gated('portfolio_page', <Portfolio />) },
-    { path: 'portfolio/:slug', element: gated('portfolio_page', <ProjectDetail />) },
-    { path: 'team', element: gated('team_page', <Team />) },
-    { path: 'team/:slug', element: gated('team_page', <TeamMemberDetail />) },
-    { path: 'about', element: gated('about_page', <About />) },
+    { path: 'services', element: gated('services', <Services />) },
+    { path: 'portfolio', element: gated('portfolio', <Portfolio />) },
+    { path: 'portfolio/:slug', element: gated('portfolio', <ProjectDetail />) },
+    { path: 'team', element: gated('team', <Team />) },
+    { path: 'team/:slug', element: gated('team', <TeamMemberDetail />) },
+    { path: 'about', element: gated('about', <About />) },
     { path: 'contact', element: <Contact /> },
     { path: '*', element: <NotFound /> },
   ]},

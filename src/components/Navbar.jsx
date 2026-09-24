@@ -10,8 +10,8 @@ export default function Navbar() {
   const [open, setOpen] = useState(false)
   const shown = useSections()
   const links = [
-    ['/', t.navHome], ['/services', t.navServices, 'services_page'], ['/portfolio', t.navPortfolio, 'portfolio_page'],
-    ['/team', t.navTeam, 'team_page'], ['/about', t.navAbout, 'about_page'], ['/contact', t.navContact],
+    ['/', t.navHome], ['/services', t.navServices, 'services'], ['/portfolio', t.navPortfolio, 'portfolio'],
+    ['/team', t.navTeam, 'team'], ['/about', t.navAbout, 'about'], ['/contact', t.navContact],
   ].filter(([, , section]) => !section || shown(section))
   return (
     <nav className="sticky top-0 z-50 border-b border-[var(--border)]" style={{ backdropFilter: 'blur(16px)', background: 'rgba(26,15,38,.78)' }}>

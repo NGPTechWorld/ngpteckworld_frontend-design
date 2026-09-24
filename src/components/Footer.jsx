@@ -17,10 +17,10 @@ export default function Footer() {
           <div className="mb-3.5 text-[15px] font-semibold">{t.footQuick}</div>
           <div className="flex flex-col gap-2.5 text-[14px] text-muted">
             <Link to="/" className="hover:text-white">{t.navHome}</Link>
-            {shown('services_page') && <Link to="/services" className="hover:text-white">{t.navServices}</Link>}
-            {shown('portfolio_page') && <Link to="/portfolio" className="hover:text-white">{t.navPortfolio}</Link>}
-            {shown('team_page') && <Link to="/team" className="hover:text-white">{t.navTeam}</Link>}
-            {shown('about_page') && <Link to="/about" className="hover:text-white">{t.navAbout}</Link>}
+            {shown('services') && <Link to="/services" className="hover:text-white">{t.navServices}</Link>}
+            {shown('portfolio') && <Link to="/portfolio" className="hover:text-white">{t.navPortfolio}</Link>}
+            {shown('team') && <Link to="/team" className="hover:text-white">{t.navTeam}</Link>}
+            {shown('about') && <Link to="/about" className="hover:text-white">{t.navAbout}</Link>}
           </div>
         </div>
         <div>

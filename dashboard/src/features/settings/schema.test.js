@@ -15,7 +15,7 @@ describe('toFormValues', () => {
   })
 
   it('shows every section the API does not mention', () => {
-    expect(toFormValues({ sections: { faq: false, team_page: false } }).sections).toEqual({ ...allShown, faq: false, team_page: false })
+    expect(toFormValues({ sections: { faq: false, team: false } }).sections).toEqual({ ...allShown, faq: false, team: false })
   })
 })
 

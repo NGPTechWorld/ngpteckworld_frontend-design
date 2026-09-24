@@ -91,7 +91,7 @@ export default function Home() {
 
             <div className="ngp-hero-item flex flex-wrap gap-3.5" style={{ '--i': 3 }}>
               <Button to="/contact">{t.heroCta1}</Button>
-              {shown('portfolio_page') && <Button to="/portfolio" variant="outline">{t.heroCta2}</Button>}
+              {shown('portfolio') && <Button to="/portfolio" variant="outline">{t.heroCta2}</Button>}
             </div>
           </div>
 
@@ -107,7 +107,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Every section below can be switched off from the dashboard (Site settings → Website sections). */}
+      {/* Every section below can be switched off from the dashboard (Site settings → Website sections).
+          services / portfolio switch off their page and menu links too, not only the section here. */}
 
       {/* ================= INTRO ================= */}
       {shown('intro') && (
@@ -140,11 +141,11 @@ export default function Home() {
           kicker={t.servicesKick}
           title={t.servicesTitle}
           sub={t.servicesSub}
-          action={shown('services_page') && (
+          action={
             <Link to="/services" className="ngp-kicker shrink-0 pb-2 transition-opacity hover:opacity-70">
               {t.servicesAll}
             </Link>
-          )}
+          }
         />
         <div data-stagger className="grid gap-[18px] sm:grid-cols-2 lg:grid-cols-3">
           {loading.services
@@ -162,8 +163,8 @@ export default function Home() {
       {shown('process') && <ProcessSteps />}
 
       {/* ================= FEATURED WORK ================= */}
-      {/* the cards open project pages, so the section also goes when the portfolio is hidden */}
-      {shown('featured') && shown('portfolio_page') && (
+      {/* part of the portfolio: one switch hides the page, its links and this section */}
+      {shown('portfolio') && (
       <section className="ngp-section">
         <SectionHeader kicker={t.featuredKick} title={t.featuredTitle} />
         <div data-stagger className="grid gap-[18px] sm:grid-cols-2 lg:grid-cols-3">

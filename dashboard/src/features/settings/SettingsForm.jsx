@@ -75,8 +75,8 @@ export function SettingsForm({ defaultValues, onSubmit, saving = false }) {
       <Card title={t.sectionsTitle} description={t.sectionsDescription}>
         <div className="space-y-6">
           {[
-            ['home', t.sectionsHome, null],
             ['pages', t.sectionsPages, t.sectionsPagesHint],
+            ['home', t.sectionsHome, null],
           ].map(([group, heading, hint]) => (
             <fieldset key={group}>
               <legend className="mb-1 text-sm font-semibold text-ink">{heading}</legend>
@@ -87,7 +87,7 @@ export function SettingsForm({ defaultValues, onSubmit, saving = false }) {
                     key={key}
                     name={`sections.${key}`}
                     control={control}
-                    render={({ field }) => <Switch checked={field.value} onChange={field.onChange} label={t.sections[key]} />}
+                    render={({ field }) => <Switch checked={field.value} onChange={field.onChange} label={t.sections[key]} description={t.sectionHints[key]} />}
                   />
                 ))}
               </div>

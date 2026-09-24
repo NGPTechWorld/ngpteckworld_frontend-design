@@ -252,10 +252,10 @@ describe('SettingsPage', () => {
     expect(save()).toBeDisabled()
 
     await user.click(screen.getByRole('switch', { name: 'Testimonials' }))
-    await user.click(screen.getByRole('switch', { name: 'Team page (and member pages)' }))
+    await user.click(screen.getByRole('switch', { name: /^Team/ }))
     await user.click(save())
 
     await waitFor(() => expect(server.calls('PUT', '/settings')).toHaveLength(1))
-    expect(server.calls('PUT', '/settings')[0].body).toEqual({ sections: { testimonials: false, team_page: false } })
+    expect(server.calls('PUT', '/settings')[0].body).toEqual({ sections: { testimonials: false, team: false } })
   })
 })

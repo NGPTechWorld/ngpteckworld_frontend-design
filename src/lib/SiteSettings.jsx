@@ -42,7 +42,7 @@ export function useSections() {
   return (key) => sections?.[key] !== false
 }
 
-/** Route wrapper for a page the dashboard can hide (`section` = e.g. 'team_page'): hidden → the 404 page. */
+/** Route wrapper for a page the dashboard can hide (`section` = e.g. 'team'): hidden → the 404 page. */
 export function SectionGate({ section, fallback, children }) {
   const { loaded } = useSiteSettings()
   const shown = useSections()

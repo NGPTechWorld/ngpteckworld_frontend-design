@@ -6,10 +6,11 @@ export const FIELDS = ['email', 'phone', ...SOCIALS]
 
 /** Mirrors SiteSetting::SECTIONS, grouped the way the form shows them. A missing key means "shown". */
 export const SECTION_GROUPS = {
-  home: ['intro', 'stats', 'services', 'process', 'featured', 'promo', 'cta', 'testimonials', 'partners', 'faq'],
-  pages: ['services_page', 'portfolio_page', 'team_page', 'about_page'],
+  // one switch hides the page, its menu / footer links and its home-page section
+  pages: ['services', 'portfolio', 'team', 'about'],
+  home: ['intro', 'stats', 'process', 'promo', 'cta', 'testimonials', 'partners', 'faq'],
 }
-export const SECTIONS = [...SECTION_GROUPS.home, ...SECTION_GROUPS.pages]
+export const SECTIONS = [...SECTION_GROUPS.pages, ...SECTION_GROUPS.home]
 
 /** Shown as the placeholder and in the hint of each social field. */
 export const EXAMPLES = {
