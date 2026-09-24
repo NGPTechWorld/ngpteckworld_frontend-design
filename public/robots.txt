@@ -5,4 +5,4 @@ Allow: /
 # pages all sit behind a login.
 Disallow: /admin
 
-Sitemap: https://ngptechworld.com/sitemap.xml
+Sitemap: https://www.ngptechworld.com/sitemap.xml

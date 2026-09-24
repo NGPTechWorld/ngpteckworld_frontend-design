@@ -11,7 +11,7 @@ const SHELL = `<!doctype html>
 <html><head>
 <!--og-->
 <title>NGP TechWorld — نبني مستقبلك الرقمي</title>
-<meta property="og:image" content="https://ngptechworld.com/assets/og-cover.jpg" />
+<meta property="og:image" content="https://www.ngptechworld.com/assets/og-cover.jpg" />
 <!--/og-->
 <script type="module" src="/assets/index-abc123.js"></script>
 </head><body><div id="app"></div></body></html>`
@@ -59,7 +59,7 @@ function makeResponse() {
   return res
 }
 
-const request = (query) => ({ url: `/api/share?${query}`, headers: { host: 'ngptechworld.com' } })
+const request = (query) => ({ url: `/api/share?${query}`, headers: { host: 'www.ngptechworld.com' } })
 
 afterEach(() => vi.unstubAllGlobals())
 
@@ -72,7 +72,7 @@ describe('share previews', () => {
     expect(res.statusCode).toBe(200)
     expect(res.body).toContain('<title>سارة أحمد — مهندسة برمجيات | NGP TechWorld</title>')
     expect(res.body).toContain('content="تبني تطبيقات موبايل منذ ست سنوات."')
-    expect(res.body).toContain('property="og:url" content="https://ngptechworld.com/team/sara-ahmad"')
+    expect(res.body).toContain('property="og:url" content="https://www.ngptechworld.com/team/sara-ahmad"')
     expect(res.body).toContain('property="og:type" content="profile"')
     // Upgraded: an http image on an https page is blocked as mixed content by several clients.
     expect(res.body).toContain('content="https://api.ngptechworld.com/media/team-profiles/sara.jpg"')

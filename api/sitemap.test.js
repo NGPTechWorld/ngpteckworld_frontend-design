@@ -28,10 +28,10 @@ it('lists the static pages and every project and member the API returns', async 
   await handler({}, res)
 
   expect(res.headers['content-type']).toContain('application/xml')
-  expect(res.body).toContain('<loc>https://ngptechworld.com/</loc>')
-  expect(res.body).toContain('<loc>https://ngptechworld.com/team</loc>')
-  expect(res.body).toContain('<loc>https://ngptechworld.com/portfolio/food-delivery-app</loc>')
-  expect(res.body).toContain('<loc>https://ngptechworld.com/team/sara-ahmad</loc>')
+  expect(res.body).toContain('<loc>https://www.ngptechworld.com/</loc>')
+  expect(res.body).toContain('<loc>https://www.ngptechworld.com/team</loc>')
+  expect(res.body).toContain('<loc>https://www.ngptechworld.com/portfolio/food-delivery-app</loc>')
+  expect(res.body).toContain('<loc>https://www.ngptechworld.com/team/sara-ahmad</loc>')
 })
 
 it('still serves the static pages when the API is unreachable', async () => {
@@ -41,6 +41,6 @@ it('still serves the static pages when the API is unreachable', async () => {
   await handler({}, res)
 
   expect(res.statusCode).toBe(200)
-  expect(res.body).toContain('<loc>https://ngptechworld.com/services</loc>')
+  expect(res.body).toContain('<loc>https://www.ngptechworld.com/services</loc>')
   expect(res.body).not.toContain('/portfolio/')
 })

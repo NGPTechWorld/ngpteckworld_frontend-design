@@ -13,7 +13,7 @@
  * Wired up by vercel.json, which rewrites /team/:slug and /portfolio/:slug here.
  */
 
-const SITE = (process.env.SITE_URL || 'https://ngptechworld.com').replace(/\/+$/, '')
+const SITE = (process.env.SITE_URL || 'https://www.ngptechworld.com').replace(/\/+$/, '')
 const API = (process.env.API_BASE_URL || 'https://api.ngptechworld.com/api').replace(/\/+$/, '')
 const FALLBACK_IMAGE = `${SITE}/assets/og-cover.jpg`
 

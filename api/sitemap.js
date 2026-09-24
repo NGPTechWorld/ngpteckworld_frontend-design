@@ -8,7 +8,7 @@
  * Wired up by vercel.json, which rewrites /sitemap.xml here.
  */
 
-const SITE = (process.env.SITE_URL || 'https://ngptechworld.com').replace(/\/+$/, '')
+const SITE = (process.env.SITE_URL || 'https://www.ngptechworld.com').replace(/\/+$/, '')
 const API = (process.env.API_BASE_URL || 'https://api.ngptechworld.com/api').replace(/\/+$/, '')
 
 const STATIC_PAGES = [
