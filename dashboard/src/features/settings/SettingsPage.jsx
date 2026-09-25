@@ -32,7 +32,14 @@ export default function SettingsPage() {
         </Alert>
       ) : (
         // the form reads its defaults once; it resets itself to the saved values after every successful save
-        <SettingsForm defaultValues={toFormValues(query.data)} onSubmit={save.mutateAsync} saving={save.isPending} />
+        <SettingsForm
+          defaultValues={toFormValues(query.data)}
+          /* Read-only, so it is a prop rather than a form field: how many visits are on record,
+             which is the thing you want to see before deciding to publish the counter. */
+          visitors={query.data?.visitors ?? 0}
+          onSubmit={save.mutateAsync}
+          saving={save.isPending}
+        />
       )}
     </>
   )

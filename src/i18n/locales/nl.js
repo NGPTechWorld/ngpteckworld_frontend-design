@@ -132,6 +132,7 @@ export default {
   errThrottle: 'Te veel pogingen. Wacht een minuut en probeer het opnieuw.',
   errGeneric: 'We konden je bericht niet versturen. Probeer het zo meteen opnieuw.',
   footTagline: 'Studio voor software- en technologieoplossingen — we bouwen jouw digitale toekomst.',
+  footVisitors: 'Bezoeken',
   footQuick: 'Snelle links',
   footRights: '© 2026 NGP TechWorld. Alle rechten voorbehouden.',
   socialMeta: {

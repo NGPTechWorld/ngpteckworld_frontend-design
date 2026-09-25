@@ -4,14 +4,27 @@ import { FIELDS, SECTIONS, SOCIALS, makeSettingsSchema, toFormValues, toPayload 
 
 const schema = makeSettingsSchema(common.en)
 const allShown = Object.fromEntries(SECTIONS.map((key) => [key, true]))
-const empty = { ...Object.fromEntries(FIELDS.map((key) => [key, ''])), sections: allShown, launch_enabled: false, launch_at: '' }
+const empty = { ...Object.fromEntries(FIELDS.map((key) => [key, ''])), sections: allShown, launch_enabled: false, launch_at: '', visitor_counter_enabled: false }
 const issues = (values) => (schema.safeParse({ ...empty, ...values }).error?.issues ?? []).map((issue) => `${issue.path.join('.')}: ${issue.message}`)
+
+describe('the visit counter switch', () => {
+  it('is off unless the API says otherwise', () => {
+    expect(toFormValues({}).visitor_counter_enabled).toBe(false)
+    expect(toFormValues({ visitor_counter_enabled: true }).visitor_counter_enabled).toBe(true)
+  })
+
+  it('is sent only when it was actually changed', () => {
+    const values = { ...empty, visitor_counter_enabled: true }
+    expect(toPayload(values, {})).not.toHaveProperty('visitor_counter_enabled')
+    expect(toPayload(values, { visitor_counter_enabled: true })).toMatchObject({ visitor_counter_enabled: true })
+  })
+})
 
 describe('toFormValues', () => {
   it('turns null into empty strings and covers every field', () => {
     expect(toFormValues({ email: 'a@b.co', phone: null, facebook: null })).toEqual({ ...empty, email: 'a@b.co' })
     expect(toFormValues(undefined)).toEqual(empty)
-    expect(Object.keys(toFormValues({}))).toEqual([...FIELDS, 'sections', 'launch_enabled', 'launch_at'])
+    expect(Object.keys(toFormValues({}))).toEqual([...FIELDS, 'sections', 'launch_enabled', 'launch_at', 'visitor_counter_enabled'])
   })
 
   it('shows every section the API does not mention', () => {

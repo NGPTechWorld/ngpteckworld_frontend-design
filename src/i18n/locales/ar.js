@@ -132,6 +132,7 @@ export default {
   errThrottle: 'محاولات كثيرة. انتظر دقيقة ثم أعد المحاولة.',
   errGeneric: 'تعذّر إرسال رسالتك. حاول مرة أخرى بعد قليل.',
   footTagline: 'شركة برمجيات وحلول تقنية — نبني مستقبلك الرقمي.',
+  footVisitors: 'الزوّار',
   footQuick: 'روابط سريعة',
   footRights: '© 2026 NGP TechWorld. جميع الحقوق محفوظة.',
   socialMeta: {

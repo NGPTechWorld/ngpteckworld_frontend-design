@@ -132,6 +132,7 @@ export default {
   errThrottle: 'Zu viele Versuche. Bitte warten Sie eine Minute und versuchen Sie es erneut.',
   errGeneric: 'Ihre Nachricht konnte nicht gesendet werden. Bitte versuchen Sie es in Kürze erneut.',
   footTagline: 'Studio für Software- und Technologielösungen — wir bauen Ihre digitale Zukunft.',
+  footVisitors: 'Besucher',
   footQuick: 'Schnellzugriff',
   footRights: '© 2026 NGP TechWorld. Alle Rechte vorbehalten.',
   socialMeta: {

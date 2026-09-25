@@ -132,6 +132,7 @@ export default {
   errThrottle: 'Çok fazla deneme. Bir dakika bekleyip tekrar deneyin.',
   errGeneric: 'Mesajınızı gönderemedik. Lütfen biraz sonra tekrar deneyin.',
   footTagline: 'Yazılım ve teknoloji çözümleri stüdyosu — dijital geleceğinizi kuruyoruz.',
+  footVisitors: 'Ziyaret',
   footQuick: 'Hızlı bağlantılar',
   footRights: '© 2026 NGP TechWorld. Tüm hakları saklıdır.',
   socialMeta: {

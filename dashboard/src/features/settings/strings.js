@@ -2,6 +2,11 @@
 export default {
   ar: {
     sectionLaunch: 'صفحة الافتتاح',
+    sectionVisitors: 'عدّاد الزوّار',
+    visitorsHint: 'رقم صغير في أسفل الموقع. التسجيل شغّال دائماً حتى لو المفتاح مطفأ، فالرقم حقيقي لحظة ما تُظهره.',
+    visitorsEnabled: 'إظهار العدّاد في الفوتر',
+    visitorsEnabledHint: 'مطفأ الآن. أظهره لمّا يصير الرقم يستاهل.',
+    visitorsSoFar: (n) => `المسجَّل حتى اللحظة: ${n}`,
     launchHint: 'تعرض عدّاً تنازلياً بدل الموقع لحتى موعد الافتتاح. الداشبورد والـ API يظلّان يعملان كالعادة.',
     launchEnabled: 'تفعيل العدّ التنازلي',
     launchEnabledHint: 'الزوّار يرون صفحة الافتتاح بدل الموقع.',
@@ -61,6 +66,11 @@ export default {
   },
   en: {
     sectionLaunch: 'Launch page',
+    sectionVisitors: 'Visit counter',
+    visitorsHint: 'A small number at the foot of the site. Visits are recorded whether or not the switch is on, so the number is a real one the moment you show it.',
+    visitorsEnabled: 'Show the counter in the footer',
+    visitorsEnabledHint: 'Off for now. Turn it on once the number is worth showing.',
+    visitorsSoFar: (n) => `Recorded so far: ${n}`,
     launchHint: 'Shows a countdown instead of the site until the launch moment. The dashboard and API keep working as usual.',
     launchEnabled: 'Run the countdown',
     launchEnabledHint: 'Visitors see the launch page instead of the site.',

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useLang } from '../i18n/LanguageContext'
 import { useSections, useSiteSettings } from '../lib/SiteSettings'
+import VisitCounter from './VisitCounter'
 
 export default function Footer() {
   const { t } = useLang()
@@ -31,7 +32,13 @@ export default function Footer() {
           </div>
         </div>
       </div>
-      <div className="border-t border-white/[.06] px-[26px] py-5 text-center text-[13px] text-[#6B5A80]">{t.footRights}</div>
+      {/* The rights line and the counter share the bottom bar: side by side where there is room,
+          stacked on a phone. `justify-center` rather than `between` so that with the counter
+          switched off the rights line stays centred exactly as it was. */}
+      <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 border-t border-white/[.06] px-[26px] py-5 text-center text-[13px] text-[#6B5A80]">
+        <span>{t.footRights}</span>
+        <VisitCounter />
+      </div>
     </footer>
   )
 }

@@ -41,6 +41,7 @@ export const toFormValues = (settings) => ({
   sections: Object.fromEntries(SECTIONS.map((key) => [key, settings?.sections?.[key] ?? true])),
   launch_enabled: Boolean(settings?.launch_enabled),
   launch_at: toLocalInput(settings?.launch_at),
+  visitor_counter_enabled: Boolean(settings?.visitor_counter_enabled),
 })
 
 const optionalEmail = (c) =>
@@ -68,6 +69,7 @@ export function makeSettingsSchema(c) {
     // partial object makes every caller that validates one field carry the launch fields too.
     launch_enabled: z.boolean().default(false),
     launch_at: z.string().default(''),
+    visitor_counter_enabled: z.boolean().default(false),
   }).refine((values) => !values.launch_enabled || values.launch_at !== '', {
     // A switch with no date does nothing at all on the site, which looks like a broken feature
     // rather than a missing field. Say so here instead.
@@ -89,6 +91,7 @@ export function toPayload(values, dirtyFields) {
   const sections = SECTIONS.filter((key) => dirtyFields.sections?.[key])
   if (sections.length) payload.sections = Object.fromEntries(sections.map((key) => [key, values.sections[key]]))
 
+  if (dirtyFields.visitor_counter_enabled) payload.visitor_counter_enabled = values.visitor_counter_enabled
   if (dirtyFields.launch_enabled) payload.launch_enabled = values.launch_enabled
   if (dirtyFields.launch_at) {
     // new Date() on a `datetime-local` value reads it as local time, and toISOString converts it

@@ -16,6 +16,9 @@ export const DEFAULT_SETTINGS = {
   // the site — a countdown nobody can switch off is a far worse failure than a missing section.
   counting_down: false,
   launch_at: null,
+  // Off unless the dashboard says otherwise: an unreachable API should not make the footer
+  // advertise a count it cannot read.
+  visitor_counter_enabled: false,
 }
 
 // Order the social buttons appear in.

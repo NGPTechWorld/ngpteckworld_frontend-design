@@ -1,6 +1,7 @@
 import React, { lazy } from 'react'
 import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { Analytics } from '@vercel/analytics/react'
 import { LanguageProvider } from './i18n/LanguageContext'
 import { ContentProvider } from './lib/SiteContent'
 import { SectionGate, SiteSettingsProvider } from './lib/SiteSettings'
@@ -41,6 +42,12 @@ ReactDOM.createRoot(document.getElementById('app')).render(
       <LanguageProvider>
         <SiteSettingsProvider>
           <RouterProvider router={router} />
+          {/* Vercel Analytics. `/react`, not `/next` — this app is Vite and React Router, and the
+              Next entry point reaches for a router that does not exist here. It is mounted outside
+              <App /> so it keeps reporting while the pre-launch countdown is holding the site
+              closed, and it is a private dashboard: the number in the footer comes from our own
+              API, not from this. */}
+          <Analytics />
         </SiteSettingsProvider>
       </LanguageProvider>
     </ContentProvider>

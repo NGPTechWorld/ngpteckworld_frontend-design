@@ -132,6 +132,7 @@ export default {
   errThrottle: 'Demasiadas tentativas. Aguarde um minuto e tente novamente.',
   errGeneric: 'Não foi possível enviar a sua mensagem. Tente novamente dentro de instantes.',
   footTagline: 'Estúdio de software e soluções tecnológicas — construímos o seu futuro digital.',
+  footVisitors: 'Visitas',
   footQuick: 'Ligações rápidas',
   footRights: '© 2026 NGP TechWorld. Todos os direitos reservados.',
   socialMeta: {

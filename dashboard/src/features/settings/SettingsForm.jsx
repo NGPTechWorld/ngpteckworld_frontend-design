@@ -13,7 +13,7 @@ import strings from './strings'
  * resolve with the saved settings: the form is then reset to them, so Save is disabled again until the next edit.
  * A 422 puts the server's messages on the matching fields (`applyServerErrors`); other failures were toasted already.
  */
-export function SettingsForm({ defaultValues, onSubmit, saving = false }) {
+export function SettingsForm({ defaultValues, onSubmit, saving = false, visitors = 0 }) {
   const c = useCommon()
   const t = useStrings(strings)
   const schema = useMemo(() => makeSettingsSchema(c), [c])
@@ -107,6 +107,21 @@ export function SettingsForm({ defaultValues, onSubmit, saving = false }) {
               </div>
             </fieldset>
           ))}
+        </div>
+      </Card>
+
+      <Card title={t.sectionVisitors} description={t.visitorsHint}>
+        <div className="space-y-4">
+          <Controller
+            name="visitor_counter_enabled"
+            control={control}
+            render={({ field }) => (
+              <Switch checked={field.value} onChange={field.onChange} label={t.visitorsEnabled} description={t.visitorsEnabledHint} />
+            )}
+          />
+          {/* The number is shown whether the switch is on or off: deciding whether it is worth
+              publishing is the reason to look at this card at all. */}
+          <Alert tone="info">{t.visitorsSoFar(new Intl.NumberFormat('en').format(visitors))}</Alert>
         </div>
       </Card>
 
