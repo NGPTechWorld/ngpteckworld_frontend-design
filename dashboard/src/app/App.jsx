@@ -22,8 +22,8 @@ export function AppProviders({ children, client = queryClient }) {
 export default function App() {
   return (
     <AppProviders>
-      {/* basename strips the /admin prefix (see vite.config.js's `base`) so every route below stays unprefixed
-          ('/faqs', '/login'…) — matches vite.config.js `base` and Vercel's proxy rewrite of /admin/* to this app. */}
+      {/* basename strips the deploy prefix (see vite.config.js's `base`) so every route below stays unprefixed
+          ('/faqs', '/login'…) — matches vite.config.js `base` and Vercel's proxy rewrite of that prefix to this app. */}
       <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
         <AuthProvider>
           <AppRoutes />

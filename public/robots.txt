@@ -1,8 +1,4 @@
 User-agent: *
 Allow: /
 
-# The dashboard is a separate app proxied onto this domain; it has nothing to index and its
-# pages all sit behind a login.
-Disallow: /admin
-
 Sitemap: https://www.ngptechworld.com/sitemap.xml

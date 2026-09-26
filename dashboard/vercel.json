@@ -1,6 +1,6 @@
 {
   "rewrites": [
-    { "source": "/admin/:path*", "destination": "/:path*" },
+    { "source": "/ngp-hq/:path*", "destination": "/:path*" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

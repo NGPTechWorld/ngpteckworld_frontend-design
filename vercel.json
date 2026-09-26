@@ -1,12 +1,16 @@
 {
   "rewrites": [
-    { "source": "/admin/:path*", "destination": "https://ngp-dashboard.vercel.app/admin/:path*" },
+    { "source": "/ngp-hq/:path*", "destination": "https://ngp-dashboard.vercel.app/ngp-hq/:path*" },
     { "source": "/sitemap.xml", "destination": "/api/sitemap" },
     { "source": "/team/:slug", "destination": "/api/share?type=team&slug=:slug" },
     { "source": "/portfolio/:slug", "destination": "/api/share?type=project&slug=:slug" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
+    {
+      "source": "/ngp-hq/:path*",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+    },
     {
       "source": "/assets/(.*)",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]

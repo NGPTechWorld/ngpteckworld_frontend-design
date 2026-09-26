@@ -6,7 +6,7 @@ public site.
 
 Lives inside the public site's repo (`ngpteckworld_frontend-design/dashboard/`) as its **own** Vite project (own
 `package.json`, own tests, own build) so it can be developed and deployed independently, but it is served at
-**`/admin`** on the site's own domain (see [Deploy](#deploy)) — one repo, one push, one visible site to visitors.
+**`/ngp-hq`** on the site's own domain (see [Deploy](#deploy)) — one repo, one push, one visible site to visitors.
 
 Stack: Vite 8 · React 19 · React Router 7 · Tailwind 3 · TanStack Query · react-hook-form + zod · dnd-kit · lucide-react ·
 Vitest + Testing Library.
@@ -27,14 +27,14 @@ Sign in with an admin user of the backend (email on the `@ngptechworld.com` doma
 ## Run
 
 ```bash
-npm run dev        # http://localhost:5174/admin/ — /api is proxied to http://127.0.0.1:8000
+npm run dev        # http://localhost:5174/ngp-hq/ — /api is proxied to http://127.0.0.1:8000
 npm test           # vitest run (jsdom); npm run test:watch for watch mode
 npm run build      # production bundle in dist/
 npm run preview    # serve dist/ on :5174
 ```
 
-`vite.config.js` sets `base: '/admin/'` (production URL shape) — that's why the dev server also serves under
-`/admin/`, not `/`.
+`vite.config.js` sets `base: '/ngp-hq/'` (production URL shape) — that's why the dev server also serves under
+`/ngp-hq/`, not `/`. It is not `/admin` on purpose: that is the first path every scanner tries.
 
 Run a subset: `npx vitest run src/features/faqs`.
 
@@ -52,9 +52,9 @@ signs the user out and redirects to `/login`.
 Deployed as its **own Vercel project**, Root Directory `dashboard` inside the site's repo — build command
 `npm run build`, output directory `dist`, env var `VITE_API_BASE_URL` = absolute API URL (must include `/api`).
 That project gets its own `*.vercel.app` URL, but visitors never see it: the **site's own** `vercel.json` (one
-level up) rewrites `/admin/*` to it, so `https://<your-site-domain>/admin` is the real, public URL. Full steps
+level up) rewrites `/ngp-hq/*` to it, so `https://<your-site-domain>/ngp-hq` is the real, public URL. Full steps
 (including the one-time step of pasting the dashboard project's URL into the site's `vercel.json`) are in
-[`../docs/DEPLOY.md`](../docs/DEPLOY.md) — read that before deploying, `base: '/admin/'` in `vite.config.js` and
+[`../docs/DEPLOY.md`](../docs/DEPLOY.md) — read that before deploying, `base: '/ngp-hq/'` in `vite.config.js` and
 this project's own `vercel.json` only work together with that outer rewrite in place.
 
 * Backend: `DASHBOARD_URL` in the Laravel `.env` should normally be the **same** origin as `FRONTEND_URL` — once

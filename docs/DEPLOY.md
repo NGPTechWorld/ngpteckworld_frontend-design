@@ -5,7 +5,7 @@ Three pieces, all live:
 | Piece | Where | URL |
 |---|---|---|
 | **Public site** (this repo's root) | Vercel project `ngp-site` | https://ngptechworld.com |
-| **Dashboard** (`dashboard/`) | Vercel project `ngp-dashboard` | https://ngptechworld.com/admin |
+| **Dashboard** (`dashboard/`) | Vercel project `ngp-dashboard` | https://www.ngptechworld.com/ngp-hq |
 | **Backend** (`ngp-backend`) | Docker on `91.99.224.132` | https://api.ngptechworld.com |
 
 The backend has its own runbook in that repo's `docs/DEPLOY.md`.
@@ -15,8 +15,8 @@ The backend has its own runbook in that repo's `docs/DEPLOY.md`.
 The dashboard is a separate Vite app (own `package.json`, build, tests) so a dashboard bug can
 never break a site deploy or vice versa — but it must **not** feel like a separate product. Vercel
 lets several projects share one repository via each project's own *Root Directory*, and one
-project's `vercel.json` transparently proxies `/admin` to the other project's URL. The result: one
-`git push` updates both, one visible domain, `/admin` just works.
+project's `vercel.json` transparently proxies `/ngp-hq` to the other project's URL. The result: one
+`git push` updates both, one visible domain, `/ngp-hq` just works.
 
 Because the dashboard is proxied rather than given its own subdomain, the browser origin for both
 apps is `https://ngptechworld.com`. That is why the backend's `FRONTEND_URL` and `DASHBOARD_URL`
@@ -54,7 +54,9 @@ Set once; recorded here because they live in Vercel's UI rather than in this rep
 | `VITE_API_BASE_URL` | `https://api.ngptechworld.com/api` | same |
 | Domains | `ngptechworld.com`, `www.ngptechworld.com` | `ngp-dashboard.vercel.app` |
 
-`vercel.json` at the repo root rewrites `/admin/:path*` to `https://ngp-dashboard.vercel.app`.
+`vercel.json` at the repo root rewrites `/ngp-hq/:path*` to `https://ngp-dashboard.vercel.app`.
+The prefix is deliberately not `/admin`, and robots.txt deliberately does not name it — a public file
+that lists what you are hiding points at it instead. An `X-Robots-Tag: noindex` header does that job.
 That is the dashboard's **stable alias**, not a deployment URL — a deployment URL changes on every
 deploy and the rewrite would break the next time the dashboard shipped.
 
@@ -83,7 +85,7 @@ If the API is unreachable the site still renders, using the fallback text in `sr
 
 ## After going live
 
-* Sign in at https://ngptechworld.com/admin and **change the seeded admin password**.
+* Sign in at https://www.ngptechworld.com/ngp-hq and **change the seeded admin password**.
 * Fill **Site settings** (phone, social links) and review **Page content**.
 * Upload real project images and team photos; add testimonials, partners and FAQs.
 * Create one account per person under **Users** rather than sharing the first admin.
@@ -91,7 +93,7 @@ If the API is unreachable the site still renders, using the fallback text in `sr
 ## Filament
 
 The backend still exposes its old Filament panel at `https://api.ngptechworld.com/admin` — a
-different thing from this dashboard's `/admin`, on a different domain. The React dashboard covers
+different thing from this dashboard, on a different domain. The React dashboard covers
 every section of it. Retiring it is worth doing: Filament stores uploaded files with the extension
 the browser supplied, which the new API does not. Remove its provider from
 `bootstrap/providers.php` in the backend repo when you are confident in the new panel.

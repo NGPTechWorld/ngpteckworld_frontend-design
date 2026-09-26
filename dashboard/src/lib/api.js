@@ -41,7 +41,7 @@ function handleUnauthorized() {
   if (unauthorizedHandler) unauthorizedHandler()
   else if (typeof window !== 'undefined') {
     // Fallback only (AuthProvider is normally mounted and handles this through the router instead): raw
-    // navigation, so it must carry the /admin prefix itself — BASE_URL already ends in '/' (e.g. '/admin/').
+    // navigation, so it must carry the deploy prefix itself — BASE_URL already ends in '/' (e.g. '/ngp-hq/').
     const loginUrl = `${import.meta.env.BASE_URL}login`
     if (window.location.pathname !== loginUrl) window.location.assign(loginUrl)
   }

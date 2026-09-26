@@ -8,10 +8,15 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   return {
     plugins: [react()],
-    // Deployed behind the public site's domain at /admin (see ../vercel.json's rewrite + src/app/App.jsx's
+    // Deployed behind the public site's domain (see ../vercel.json's rewrite + src/app/App.jsx's
     // `basename`) — every asset URL must carry that prefix, so the browser (whose address bar shows the main
-    // site's origin) requests /admin/assets/... instead of /assets/....
-    base: '/admin/',
+    // site's origin) requests <prefix>/assets/... instead of /assets/....
+    //
+    // Not /admin. That is the first path every automated scanner tries, and robots.txt used to name it
+    // outright, which advertised it rather than hid it. This is the single place the prefix is written:
+    // App.jsx reads it back through import.meta.env.BASE_URL, and the two vercel.json files route it.
+    // It buys quiet, not safety — the login and the token are what protect the dashboard.
+    base: '/ngp-hq/',
     resolve: {
       // `@/ui`, `@/lib/api`, `@/i18n`… resolve from src/ (mirrored in jsconfig.json for editors)
       alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
