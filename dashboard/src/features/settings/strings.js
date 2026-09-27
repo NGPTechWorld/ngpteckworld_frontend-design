@@ -45,6 +45,7 @@ export default {
       portfolio: 'أعمالنا',
       team: 'فريقنا',
       about: 'من نحن',
+      offers: 'العروض',
       intro: 'الفقرة التعريفية',
       stats: 'الأرقام والإحصائيات',
       process: 'مراحل العمل',
@@ -59,6 +60,7 @@ export default {
       portfolio: 'الصفحة وصفحات المشاريع والتبويب و«أعمال مختارة» وزر «شاهد أعمالنا»',
       team: 'الصفحة وصفحات الأعضاء والتبويب',
       about: 'الصفحة والتبويب',
+      offers: 'الصفحة وصفحات العروض والتبويب',
     },
 
     discard: 'تجاهل التغييرات',
@@ -109,6 +111,7 @@ export default {
       portfolio: 'Portfolio',
       team: 'Team',
       about: 'About',
+      offers: 'Offers',
       intro: 'Intro paragraph',
       stats: 'Stats',
       process: 'How we work',
@@ -123,6 +126,7 @@ export default {
       portfolio: 'Page, project pages, menu tab, “Featured work” and the “See our work” button',
       team: 'Page, member pages and menu tab',
       about: 'Page and menu tab',
+      offers: 'Page, offer pages and menu tab',
     },
 
     discard: 'Discard changes',

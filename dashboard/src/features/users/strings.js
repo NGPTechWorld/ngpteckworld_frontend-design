@@ -50,6 +50,8 @@ export default {
       stats: 'الإحصائيات',
       team: 'فريقنا',
       testimonials: 'آراء العملاء',
+      offers: 'العروض',
+      'offer-requests': 'طلبات العروض',
     },
   },
   en: {
@@ -99,6 +101,8 @@ export default {
       stats: 'Stats',
       team: 'Our Team',
       testimonials: 'Testimonials',
+      offers: 'Offers',
+      'offer-requests': 'Offer requests',
     },
   },
 }
