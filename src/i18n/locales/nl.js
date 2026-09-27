@@ -101,6 +101,7 @@ export default {
   oFeatures: "Functies",
   oPlans: "Abonnementen",
   oPopular: "Meest gekozen",
+  oDays: (n) => `${n} ${n === 1 ? 'dag' : 'dagen'}`,
   oBook: "Nu boeken",
   oAsk: "Vraag over dit aanbod",
   oBookPlan: "Kies dit abonnement",

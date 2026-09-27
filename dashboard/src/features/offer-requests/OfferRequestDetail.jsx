@@ -7,6 +7,7 @@ import { Alert, Button, Card, EmptyState, Field, PageHeader, PageSpinner, Select
 import { statusOptions } from '@/features/requests/constants'
 import { offerRequests } from './hooks'
 import { NotesForm } from './NotesForm'
+import { SubscriptionCard } from './SubscriptionCard'
 import strings from './strings'
 import { TypeBadge } from './TypeBadge'
 
@@ -106,6 +107,7 @@ export default function OfferRequestDetail() {
               <p className="text-sm text-faint">{t.noMessage}</p>
             )}
           </Card>
+          <SubscriptionCard key={`sub-${request.id}`} request={request} />
           <NotesForm key={request.id} request={request} />
         </div>
 

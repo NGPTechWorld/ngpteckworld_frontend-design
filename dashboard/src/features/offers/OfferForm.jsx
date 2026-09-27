@@ -1,10 +1,10 @@
 import { useId, useMemo, useState } from 'react'
-import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form'
+import { Controller, get, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowDown, ArrowUp, Plus, Trash2 } from 'lucide-react'
+import { ArrowDown, ArrowUp, Minus, Plus, Trash2 } from 'lucide-react'
 import { useCommon, useStrings } from '@/i18n'
 import { applyServerErrors } from '@/lib/applyServerErrors'
-import { BilingualField, Button, Card, Field, FormActions, GalleryUpload, IconButton, ImageUpload, Input, Switch } from '@/ui'
+import { BilingualField, Button, Card, Field, FormActions, GalleryUpload, IconButton, ImageUpload, Input, Switch, fieldErrorMessage } from '@/ui'
 import { GALLERY_MAX, emptyFeature, emptyOffer, emptyPlan, makeOfferSchema } from './schema'
 import strings from './strings'
 
@@ -20,6 +20,49 @@ function LabeledGroup({ label, hint, error, children }) {
       {error ? <p role="alert" className="mt-1.5 text-xs font-medium text-danger">{error}</p> : null}
       {hint ? <p className="mt-1.5 text-xs text-muted">{hint}</p> : null}
     </div>
+  )
+}
+
+/** Length of a plan in days: a number with − / + and one-click presets (a month, three months, a year). */
+function DurationField({ name, control, errors }) {
+  const t = useStrings(strings)
+  return (
+    <Controller
+      name={name}
+      control={control}
+      render={({ field }) => {
+        const value = field.value === '' || field.value == null ? '' : Number(field.value)
+        const step = (delta) => field.onChange(String(Math.min(3650, Math.max(1, (Number(value) || 0) + delta))))
+        return (
+          <Field label={t.planDuration} hint={t.planDurationHint} error={fieldErrorMessage(get(errors, name))}>
+            <div className="flex flex-wrap items-center gap-2">
+              <IconButton icon={Minus} label={t.durationLess} onClick={() => step(-1)} disabled={!value || value <= 1} />
+              <Input
+                ref={field.ref}
+                type="number"
+                inputMode="numeric"
+                min={1}
+                max={3650}
+                dir="ltr"
+                className="!w-28 text-center"
+                value={value}
+                onChange={(e) => field.onChange(e.target.value)}
+                onBlur={field.onBlur}
+              />
+              <IconButton icon={Plus} label={t.durationMore} onClick={() => step(1)} disabled={value >= 3650} />
+              <span className="text-sm text-muted">{t.days}</span>
+              <div className="ms-2 flex flex-wrap gap-1.5">
+                {[30, 90, 180, 365].map((days) => (
+                  <Button key={days} type="button" size="sm" variant={value === days ? 'primary' : 'secondary'} onClick={() => field.onChange(String(days))}>
+                    {t.durationPreset[days]}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </Field>
+        )
+      }}
+    />
   )
 }
 
@@ -159,7 +202,8 @@ export function OfferForm({ defaultValues = emptyOffer, offer, onSubmit, saving 
         renderEntry={(index) => (
           <>
             <BilingualField name={`plans.${index}.name`} label={t.planName} register={register} errors={errors} required maxLength={255} placeholder={{ ar: 'شهري', en: 'Monthly' }} />
-            <BilingualField name={`plans.${index}.price`} label={t.planPrice} hint={t.planPriceHint} register={register} errors={errors} maxLength={100} placeholder={{ ar: '20$ شهريًا', en: '$20 / month' }} />
+            <BilingualField name={`plans.${index}.price`} label={t.planPrice} hint={t.planPriceHint} register={register} errors={errors} maxLength={100} placeholder={{ ar: '20$', en: '$20' }} />
+            <DurationField name={`plans.${index}.duration_days`} control={control} errors={errors} />
             <BilingualField name={`plans.${index}.description`} label={t.planDescription} register={register} errors={errors} multiline rows={3} maxLength={2000} />
             <Controller
               name={`plans.${index}.highlighted`}

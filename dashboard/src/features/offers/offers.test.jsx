@@ -75,6 +75,7 @@ describe('OfferCreate', () => {
     await user.type(screen.getByLabelText('Plan name (English)'), 'Yearly')
     await user.type(screen.getByLabelText('Price (English)'), '$200 / year')
     await user.click(screen.getByRole('switch', { name: /Highlighted plan/ }))
+    await user.click(screen.getByRole('button', { name: 'Year' }))
 
     await user.click(screen.getByRole('button', { name: 'Save' }))
 
@@ -82,7 +83,7 @@ describe('OfferCreate', () => {
     const body = server.calls('POST', '/offers')[0].body
     expect(body).toMatchObject({ title_en: 'Cloud service', slug: null, video_url: null, gallery: [], is_active: true })
     expect(body.features).toEqual([{ title_ar: 'نسخ احتياطي', title_en: 'Backups', description_ar: null, description_en: null }])
-    expect(body.plans).toEqual([{ name_ar: 'سنوي', name_en: 'Yearly', price_ar: null, price_en: '$200 / year', description_ar: null, description_en: null, highlighted: true }])
+    expect(body.plans).toEqual([{ name_ar: 'سنوي', name_en: 'Yearly', price_ar: null, price_en: '$200 / year', duration_days: 365, description_ar: null, description_en: null, highlighted: true }])
     await waitFor(() => expect(screen.getByTestId('location')).toHaveTextContent(/^\/offers$/))
   })
 })

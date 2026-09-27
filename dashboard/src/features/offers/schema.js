@@ -1,12 +1,12 @@
 import { z } from 'zod'
 import { galleryPaths, toGalleryItems } from '@/ui'
-import { emptyToNull, optionalText, optionalUrl, requiredText } from '@/lib/validation'
+import { emptyToNull, intField, optionalText, optionalUrl, requiredText } from '@/lib/validation'
 
 export const GALLERY_MAX = 30
 
 /** Mirrors App\Support\OfferSections: the offer's features and its subscription plans, all bilingual. */
 export const emptyFeature = () => ({ title_ar: '', title_en: '', description_ar: '', description_en: '' })
-export const emptyPlan = () => ({ name_ar: '', name_en: '', price_ar: '', price_en: '', description_ar: '', description_en: '', highlighted: false })
+export const emptyPlan = () => ({ name_ar: '', name_en: '', price_ar: '', price_en: '', duration_days: '', description_ar: '', description_en: '', highlighted: false })
 
 export const emptyOffer = {
   slug: '',
@@ -46,6 +46,8 @@ export function makeOfferSchema(c) {
       name_en: requiredText(c, 255),
       price_ar: optionalText(c, 100),
       price_en: optionalText(c, 100),
+      // days one subscription runs (the request's end date counts from it); '' = not set
+      duration_days: z.union([z.literal(''), intField(c, { min: 1, max: 3650 })]),
       description_ar: optionalText(c, 2000),
       description_en: optionalText(c, 2000),
       highlighted: z.boolean(),
@@ -71,6 +73,7 @@ export const toFormValues = (offer) => ({
   plans: (offer.plans ?? []).map((p) => ({
     name_ar: p.name_ar, name_en: p.name_en,
     price_ar: blank(p.price_ar), price_en: blank(p.price_en),
+    duration_days: p.duration_days ?? '',
     description_ar: blank(p.description_ar), description_en: blank(p.description_en),
     highlighted: Boolean(p.highlighted),
   })),
@@ -89,6 +92,7 @@ export const toPayload = (values) => ({
   plans: values.plans.map((p) => ({
     ...p,
     price_ar: emptyToNull(p.price_ar), price_en: emptyToNull(p.price_en),
+    duration_days: p.duration_days === '' ? null : Number(p.duration_days),
     description_ar: emptyToNull(p.description_ar), description_en: emptyToNull(p.description_en),
   })),
   plans_note_ar: emptyToNull(values.plans_note_ar),

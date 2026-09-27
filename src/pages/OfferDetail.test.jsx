@@ -21,7 +21,7 @@ const offer = {
   features: [{ title_ar: 'فواتير', title_en: 'Invoices', description_ar: 'نقدي وآجل', description_en: null }],
   plans: [
     { name_ar: 'شهري', name_en: 'Monthly', price_ar: '20$', price_en: '$20', description_ar: null, description_en: null, highlighted: false },
-    { name_ar: 'سنوي', name_en: 'Yearly', price_ar: '200$', price_en: '$200', description_ar: null, description_en: null, highlighted: true },
+    { name_ar: 'سنوي', name_en: 'Yearly', price_ar: '200$', price_en: '$200', duration_days: 365, description_ar: null, description_en: null, highlighted: true },
   ],
   plans_note_ar: 'يمكن الإلغاء في أي وقت', plans_note_en: null,
 }
@@ -70,6 +70,10 @@ test('shows the details: description, features, plans with the highlighted one a
   expect(screen.getByText('200$')).toBeInTheDocument()
   expect(screen.getByText(t.oPopular)).toBeInTheDocument()
   expect(screen.getByText('يمكن الإلغاء في أي وقت')).toBeInTheDocument()
+  expect(screen.getByText(t.oDays(365))).toBeInTheDocument()
+  // the plans come right after the description, before the features
+  const order = [...document.querySelectorAll('h2')].map((h) => h.textContent)
+  expect(order.indexOf(t.oPlans)).toBeLessThan(order.indexOf(t.oFeatures))
 })
 
 test('books a chosen plan', async () => {

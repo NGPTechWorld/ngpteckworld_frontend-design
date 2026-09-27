@@ -101,6 +101,7 @@ export default {
   oFeatures: "Özellikler",
   oPlans: "Abonelik paketleri",
   oPopular: "En çok tercih edilen",
+  oDays: (n) => `${n} gün`,
   oBook: "Hemen rezerve et",
   oAsk: "Bu teklif hakkında soru sor",
   oBookPlan: "Bu paketi seç",

@@ -101,6 +101,7 @@ export default {
   oFeatures: "Recursos",
   oPlans: "Planos de assinatura",
   oPopular: "Mais procurado",
+  oDays: (n) => `${n} ${n === 1 ? 'dia' : 'dias'}`,
   oBook: "Reservar agora",
   oAsk: "Perguntar sobre esta oferta",
   oBookPlan: "Escolher este plano",

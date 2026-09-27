@@ -10,6 +10,7 @@ import { STATUSES, statusOptions } from '@/features/requests/constants'
 import { TYPES, offerRequests, useBulkOfferRequests } from './hooks'
 import strings from './strings'
 import { TypeBadge } from './TypeBadge'
+import { RemainingBadge } from './SubscriptionCard'
 
 const DEFAULTS = { per_page: 15, sort: 'created_at', dir: 'desc' }
 const stop = (event) => event.stopPropagation()
@@ -97,6 +98,21 @@ export default function OfferRequestList() {
           ) : null}
         </div>
       ),
+    },
+    {
+      key: 'accepted_at',
+      header: t.expiresAt,
+      sortable: true,
+      hideBelow: 'lg',
+      cell: (row) =>
+        row.expires_at ? (
+          <div className="flex flex-col items-start gap-1">
+            <span className="whitespace-nowrap text-muted">{f.date(`${row.expires_at}T12:00:00`)}</span>
+            <RemainingBadge expiresAt={row.expires_at} />
+          </div>
+        ) : (
+          <span className="text-faint">{row.accepted_at ? '—' : t.notAccepted}</span>
+        ),
     },
     {
       key: 'status',

@@ -74,6 +74,36 @@ export default function OfferDetail() {
         <p className="whitespace-pre-line text-[16.5px] leading-[1.95] text-soft" dir="auto">{pick(offer, 'description')}</p>
       </section>
 
+      {/* ================= PLANS ================= */}
+      {/* Right after the description: the price is what a visitor looks for first. */}
+      {plans.length > 0 && (
+        <section className="mb-14">
+          <Heading>{t.oPlans}</Heading>
+          <div data-grid3 className="grid items-stretch gap-[18px]" style={{ gridTemplateColumns: `repeat(${Math.min(plans.length, 3)},1fr)` }}>
+            {plans.map((plan, i) => {
+              const name = pick(plan, 'name')
+              return (
+                <div key={i} className={`relative flex flex-col rounded-2xl border p-7 ${plan.highlighted ? 'border-accent-light' : 'border-[var(--border)]'}`}
+                  style={{ background: plan.highlighted ? 'linear-gradient(160deg,rgba(107,78,142,.35),rgba(48,29,61,.4))' : 'var(--card-bg)' }}>
+                  {plan.highlighted && (
+                    <span className="absolute -top-3 start-6 rounded-full bg-accent px-3 py-1 text-[12px] font-semibold text-white">{t.oPopular}</span>
+                  )}
+                  <h3 className="mb-2 text-[19px] font-bold" dir="auto">{name}</h3>
+                  {pick(plan, 'price') && <div className="mb-1 font-poppins text-[26px] font-bold ngp-grad" dir="auto">{pick(plan, 'price')}</div>}
+                  {plan.duration_days > 0 && <div className="mb-4 text-[13.5px] text-muted">{t.oDays(plan.duration_days)}</div>}
+                  {pick(plan, 'description') && <p className="mb-6 flex-1 whitespace-pre-line text-[14.5px] leading-[1.75] text-soft" dir="auto">{pick(plan, 'description')}</p>}
+                  <button type="button" onClick={() => book(name)}
+                    className={`mt-auto rounded-xl px-5 py-3 font-semibold ${plan.highlighted ? 'btn-p bg-accent text-white' : 'border border-white/20 text-ink hover:bg-white/5'}`}>
+                    {t.oBookPlan}
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+          {plansNote && <p className="mt-6 max-w-[860px] whitespace-pre-line text-[14.5px] leading-[1.8] text-muted" dir="auto">{plansNote}</p>}
+        </section>
+      )}
+
       {/* ================= VIDEO ================= */}
       {embedUrl ? (
         <section className="mb-14">
@@ -119,34 +149,6 @@ export default function OfferDetail() {
               </button>
             ))}
           </div>
-        </section>
-      )}
-
-      {/* ================= PLANS ================= */}
-      {plans.length > 0 && (
-        <section className="mb-10">
-          <Heading>{t.oPlans}</Heading>
-          <div data-grid3 className="grid items-stretch gap-[18px]" style={{ gridTemplateColumns: `repeat(${Math.min(plans.length, 3)},1fr)` }}>
-            {plans.map((plan, i) => {
-              const name = pick(plan, 'name')
-              return (
-                <div key={i} className={`relative flex flex-col rounded-2xl border p-7 ${plan.highlighted ? 'border-accent-light' : 'border-[var(--border)]'}`}
-                  style={{ background: plan.highlighted ? 'linear-gradient(160deg,rgba(107,78,142,.35),rgba(48,29,61,.4))' : 'var(--card-bg)' }}>
-                  {plan.highlighted && (
-                    <span className="absolute -top-3 start-6 rounded-full bg-accent px-3 py-1 text-[12px] font-semibold text-white">{t.oPopular}</span>
-                  )}
-                  <h3 className="mb-2 text-[19px] font-bold" dir="auto">{name}</h3>
-                  {pick(plan, 'price') && <div className="mb-4 font-poppins text-[26px] font-bold ngp-grad" dir="auto">{pick(plan, 'price')}</div>}
-                  {pick(plan, 'description') && <p className="mb-6 flex-1 whitespace-pre-line text-[14.5px] leading-[1.75] text-soft" dir="auto">{pick(plan, 'description')}</p>}
-                  <button type="button" onClick={() => book(name)}
-                    className={`mt-auto rounded-xl px-5 py-3 font-semibold ${plan.highlighted ? 'btn-p bg-accent text-white' : 'border border-white/20 text-ink hover:bg-white/5'}`}>
-                    {t.oBookPlan}
-                  </button>
-                </div>
-              )
-            })}
-          </div>
-          {plansNote && <p className="mt-6 max-w-[860px] whitespace-pre-line text-[14.5px] leading-[1.8] text-muted" dir="auto">{plansNote}</p>}
         </section>
       )}
 
