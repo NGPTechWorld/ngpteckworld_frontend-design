@@ -27,3 +27,6 @@ dist-ssr
 .env
 .env.local
 .vercel
+
+# pdf.js run-time data, copied from node_modules by scripts/copy-pdfjs-assets.mjs
+public/pdfjs
