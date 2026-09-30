@@ -50,7 +50,7 @@ export default function Offers() {
       {failed && <p role="status" className="py-10 text-center text-muted">{t.loadError}</p>}
       {!failed && offers?.length === 0 && <p className="py-10 text-center text-muted">{t.offersEmpty}</p>}
       <div data-grid3 data-stagger className="grid gap-[18px]" style={{ gridTemplateColumns: 'repeat(3,1fr)' }}>
-        {offers === null ? <SkeletonGrid count={3} /> : offers.map((offer) => <OfferCard key={offer.id} offer={offer} />)}
+        {offers === null ? <SkeletonGrid count={3} variant="offer" /> : offers.map((offer) => <OfferCard key={offer.id} offer={offer} />)}
       </div>
     </div>
   )

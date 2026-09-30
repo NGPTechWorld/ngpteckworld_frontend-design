@@ -24,9 +24,9 @@ const ASSETS = `${import.meta.env.BASE_URL ?? '/'}pdfjs/`
  * Opens the PDF at `url` (the API's /books/{slug}/file, served with CORS) and resolves the pdf.js document:
  * `{ numPages, getPage(n) }`. Range requests are off — the file is fetched whole, which every host supports.
  */
-export async function openPdf(url) {
+export async function openPdf(url, { onProgress } = {}) {
   const lib = await pdfjs()
-  return lib.getDocument({
+  const task = lib.getDocument({
     url,
     disableRange: true,
     disableStream: true,
@@ -36,5 +36,8 @@ export async function openPdf(url) {
     standardFontDataUrl: `${ASSETS}standard_fonts/`,
     wasmUrl: `${ASSETS}wasm/`,
     iccUrl: `${ASSETS}iccs/`,
-  }).promise
+  })
+  // `loaded` / `total` bytes while the file downloads (total is 0 when the size is not known yet)
+  if (onProgress) task.onProgress = ({ loaded, total }) => onProgress({ loaded, total: total || 0 })
+  return task.promise
 }

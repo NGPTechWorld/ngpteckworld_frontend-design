@@ -8,8 +8,37 @@ import Icon from '../components/Icon'
 import PageTitle from '../components/PageTitle'
 import Lightbox from '../components/Lightbox'
 import OfferRequestModal from '../components/OfferRequestModal'
+import Skeleton from '../components/fx/Skeleton'
 
 const CHECK = '<polyline points="20 6 9 17 4 12"/>'
+
+/** The page's own layout while the offer loads: header with its image, the description and the plans. */
+function OfferDetailSkeleton() {
+  return (
+    <div className="mx-auto max-w-site px-[26px] pb-[90px] pt-10" aria-busy="true">
+      <Skeleton className="mb-6 h-[14px] w-32" />
+      <div data-grid2 className="mb-14 grid items-center gap-10" style={{ gridTemplateColumns: '1.05fr .95fr' }}>
+        <div>
+          <Skeleton className="mb-4 h-[12px] w-24" />
+          <Skeleton className="mb-4 h-[40px] w-3/4" />
+          <Skeleton className="mb-2 h-[16px] w-full" />
+          <Skeleton className="mb-7 h-[16px] w-4/5" />
+          <div className="flex gap-3.5">
+            <Skeleton className="h-[50px] w-36 !rounded-xl" />
+            <Skeleton className="h-[50px] w-44 !rounded-xl" />
+          </div>
+        </div>
+        <Skeleton className="!rounded-2xl" style={{ aspectRatio: '16 / 10' }} />
+      </div>
+      <div className="mb-14 max-w-[860px]">
+        {['w-full', 'w-full', 'w-11/12', 'w-3/4'].map((w, i) => <Skeleton key={i} className={`mb-3 h-[15px] ${w}`} />)}
+      </div>
+      <div data-grid3 className="grid gap-[18px]" style={{ gridTemplateColumns: 'repeat(3,1fr)' }}>
+        {[0, 1, 2].map((i) => <Skeleton key={i} className="h-[260px] !rounded-2xl" />)}
+      </div>
+    </div>
+  )
+}
 
 function Heading({ children }) {
   return <h2 className="mb-6 text-[26px] font-bold">{children}</h2>
@@ -32,7 +61,7 @@ export default function OfferDetail() {
   }, [slug])
 
   if (offer === false) return <div className="mx-auto max-w-narrow px-[26px] py-24 text-center text-muted">{t.oNotFound}</div>
-  if (!offer) return <div className="mx-auto max-w-narrow px-[26px] py-24 text-center text-muted">…</div>
+  if (!offer) return <OfferDetailSkeleton />
 
   const title = pick(offer, 'title')
   const images = [offer.cover_image, ...(offer.gallery ?? [])].filter(Boolean)

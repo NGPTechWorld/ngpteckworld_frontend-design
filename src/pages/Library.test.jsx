@@ -90,7 +90,7 @@ test('reads the book on the site: every page, the counter, and one reader counte
   const first = renderAt('/library/clean-code/read')
 
   await waitFor(() => expect(document.querySelectorAll('[data-page]')).toHaveLength(3))
-  expect(openPdf).toHaveBeenCalledWith(book.file_url)
+  expect(openPdf).toHaveBeenCalledWith(book.file_url, expect.objectContaining({ onProgress: expect.any(Function) }))
   expect(screen.getByText(t.readerPage(1, 3))).toBeInTheDocument()
   await waitFor(() => expect(api.readBook).toHaveBeenCalledTimes(1))
   expect(api.readBook).toHaveBeenCalledWith('clean-code')
@@ -99,6 +99,24 @@ test('reads the book on the site: every page, the counter, and one reader counte
   renderAt('/library/clean-code/read')
   await waitFor(() => expect(document.querySelectorAll('[data-page]')).toHaveLength(3))
   expect(api.readBook).toHaveBeenCalledTimes(1) // the same browser is not counted twice
+})
+
+test('shows the cover, title and download progress while the PDF arrives, then the pages over placeholders', async () => {
+  let finish
+  openPdf.mockImplementation((_url, { onProgress }) => new Promise((resolve) => {
+    onProgress({ loaded: 1_750_000, total: 3_500_000 })
+    finish = () => resolve(fakeDoc(2))
+  }))
+  renderAt('/library/clean-code/read')
+
+  const bar = await screen.findByRole('progressbar')
+  expect(bar).toHaveAttribute('aria-valuenow', '50')
+  expect(screen.getByText('50%')).toBeInTheDocument()
+  expect(screen.getAllByText('الكود النظيف').length).toBeGreaterThan(0) // toolbar + loading panel
+
+  finish()
+  await waitFor(() => expect(document.querySelectorAll('[data-page]')).toHaveLength(2))
+  expect(screen.queryByRole('progressbar')).toBeNull()
 })
 
 test('says so when the PDF cannot be opened', async () => {

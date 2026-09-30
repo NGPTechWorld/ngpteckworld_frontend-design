@@ -6,6 +6,8 @@ import { useLang } from '../i18n/LanguageContext'
 import { toHttpUrl } from '../lib/url'
 import Icon from '../components/Icon'
 import PageTitle from '../components/PageTitle'
+import Skeleton from '../components/fx/Skeleton'
+import { BookCover } from './Library'
 
 const ZOOMS = [0.6, 0.75, 0.9, 1, 1.25, 1.5, 2]
 const READ_KEY = (slug) => `ngp.read.${slug}`
@@ -32,6 +34,7 @@ function PdfPage({ doc, number, width, ratio, onVisible }) {
   const box = useRef(null)
   const canvas = useRef(null)
   const [near, setNear] = useState(false)
+  const [ready, setReady] = useState(false) // drawn at least once: the placeholder can go
 
   useEffect(() => {
     const el = box.current
@@ -58,14 +61,56 @@ function PdfPage({ doc, number, width, ratio, onVisible }) {
       el.style.width = `${width}px`
       el.style.height = `${Math.floor(viewport.height / dpr)}px`
       task = page.render({ canvasContext: el.getContext('2d'), viewport })
-      task.promise.catch(() => {}) // a cancelled render rejects; that is expected
+      task.promise.then(() => { if (!cancelled) setReady(true) }, () => {}) // a cancelled render rejects; that is expected
     }).catch(() => {})
     return () => { cancelled = true; task?.cancel() }
   }, [doc, number, width, near])
 
+  // Until the page is drawn: a shimmering sheet of the page's own size with its number, so the scroll
+  // position is right and it reads as "coming" rather than as a blank white page.
   return (
-    <div ref={box} data-page={number} className="mx-auto overflow-hidden rounded-md bg-white shadow-cardhover" style={{ width, minHeight: Math.round(width * ratio) }}>
-      <canvas ref={canvas} aria-label={`${number}`} />
+    <div ref={box} data-page={number} className={`relative mx-auto overflow-hidden rounded-md shadow-cardhover ${ready ? 'bg-white' : ''}`} style={{ width, minHeight: Math.round(width * ratio) }}>
+      {!ready && (
+        <div className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
+          <div className="ngp-skel absolute inset-0 !rounded-md" />
+          <span className="relative font-poppins text-[22px] font-semibold text-white/25">{number}</span>
+        </div>
+      )}
+      <canvas ref={canvas} aria-label={`${number}`} className="ngp-page-canvas relative block" data-ready={ready || undefined} />
+    </div>
+  )
+}
+
+/** "3.4 MB" for a byte count. */
+const mb = (bytes) => `${(bytes / 1024 / 1024).toFixed(1)} MB`
+
+/** While the PDF downloads: the book's cover and title, and how much has arrived. */
+function LoadingPanel({ book, progress, t, pick }) {
+  const { loaded, total } = progress
+  const percent = total > 0 ? Math.min(100, Math.round((loaded / total) * 100)) : null
+  return (
+    <div role="status" className="mx-auto flex max-w-[420px] flex-col items-center gap-5 py-16 text-center">
+      {book ? (
+        <BookCover book={book} className="w-[150px] rounded-xl border border-white/[.12] shadow-cardhover" />
+      ) : (
+        <Skeleton className="w-[150px] !rounded-xl" style={{ aspectRatio: '3 / 4' }} />
+      )}
+      {book ? (
+        <p className="text-[17px] font-semibold" dir="auto">{pick(book, 'title')}</p>
+      ) : (
+        <Skeleton className="h-[18px] w-48" />
+      )}
+      <div className="w-full">
+        <div className="ngp-progress" data-indeterminate={percent === null || undefined} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={percent ?? undefined} aria-label={t.readerLoading}>
+          <span style={percent === null ? undefined : { width: `${percent}%` }} />
+        </div>
+        <div className="mt-2.5 flex items-center justify-between gap-3 text-[13px] text-muted">
+          <span>{t.readerLoading}</span>
+          <span className="tabular-nums" dir="ltr">
+            {percent !== null ? `${percent}%` : loaded > 0 ? mb(loaded) : ''}
+          </span>
+        </div>
+      </div>
     </div>
   )
 }
@@ -77,6 +122,7 @@ export default function BookReader() {
   const [book, setBook] = useState(null)
   const [doc, setDoc] = useState(null)
   const [failed, setFailed] = useState(false)
+  const [progress, setProgress] = useState({ loaded: 0, total: 0 })
   const [ratio, setRatio] = useState(1.414) // A4 until the first page tells us better
   const [zoomIndex, setZoomIndex] = useState(ZOOMS.indexOf(1))
   const [current, setCurrent] = useState(1)
@@ -91,12 +137,13 @@ export default function BookReader() {
 
   useEffect(() => {
     let alive = true
-    setBook(null); setDoc(null); setFailed(false); setCurrent(1)
+    setBook(null); setDoc(null); setFailed(false); setCurrent(1); setProgress({ loaded: 0, total: 0 })
     api.getBook(slug)
       .then((data) => {
         if (!alive) return null
         setBook(data)
-        return openPdf(data.file_url).then(async (pdf) => {
+        const onProgress = (p) => { if (alive) setProgress(p) }
+        return openPdf(data.file_url, { onProgress }).then(async (pdf) => {
           const first = await pdf.getPage(1)
           const viewport = first.getViewport({ scale: 1 })
           if (!alive) return
@@ -137,7 +184,7 @@ export default function BookReader() {
       <div className="sticky z-40 border-b border-[var(--border)]" style={{ top: navHeight, backdropFilter: 'blur(14px)', background: 'rgba(26,15,38,.85)' }}>
         <div className="mx-auto flex max-w-site flex-wrap items-center gap-x-4 gap-y-2 px-[18px] py-2.5">
           <Link to={`/library/${slug}`} className="shrink-0 text-[14px] text-accent-light">{t.readerBack}</Link>
-          <h1 className="min-w-0 flex-1 truncate text-[15px] font-semibold" dir="auto">{title}</h1>
+          <h1 className="min-w-0 flex-1 truncate text-[15px] font-semibold" dir="auto">{title || <Skeleton className="h-[15px] w-40" />}</h1>
           {doc && <span className="text-[13px] text-muted" aria-live="polite">{t.readerPage(current, doc.numPages)}</span>}
           <div className="flex items-center gap-1.5">
             <button type="button" onClick={() => setZoomIndex((i) => Math.max(0, i - 1))} disabled={zoomIndex === 0} aria-label={t.readerZoomOut}
@@ -157,10 +204,7 @@ export default function BookReader() {
           {failed ? (
             <p role="alert" className="py-24 text-center text-muted">{t.readerError}</p>
           ) : !doc ? (
-            <div role="status" className="flex flex-col items-center gap-3 py-24 text-muted">
-              <span className="ngp-spinner" />
-              <span className="text-[14px]">{t.readerLoading}</span>
-            </div>
+            <LoadingPanel book={book} progress={progress} t={t} pick={pick} />
           ) : (
             <div className="flex flex-col gap-4" style={{ width: pageWidth > width ? pageWidth : undefined }}>
               {Array.from({ length: doc.numPages }, (_, i) => (

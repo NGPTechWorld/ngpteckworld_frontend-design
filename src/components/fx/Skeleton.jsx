@@ -44,9 +44,41 @@ export function SkeletonProjectCard() {
   )
 }
 
+/** Matches the Offers card: 16:10 image, title, two lines of copy, the "View details" link. */
+export function SkeletonOfferCard() {
+  return (
+    <div className="ngp-card flex h-full flex-col overflow-hidden" aria-hidden="true">
+      <Skeleton className="!rounded-none" style={{ aspectRatio: '16 / 10' }} />
+      <div className="flex flex-1 flex-col p-6">
+        <Skeleton className="mb-3 h-[19px] w-2/3" />
+        <Skeleton className="mb-2 h-[13px] w-full" />
+        <Skeleton className="mb-5 h-[13px] w-4/5" />
+        <Skeleton className="mt-auto h-[12px] w-24" />
+      </div>
+    </div>
+  )
+}
+
+/** Matches the Library card: 3:4 cover, a two-line title, the author and the readers line. */
+export function SkeletonBookCard() {
+  return (
+    <div className="ngp-card flex h-full flex-col overflow-hidden" aria-hidden="true">
+      <Skeleton className="!rounded-none" style={{ aspectRatio: '3 / 4' }} />
+      <div className="flex flex-1 flex-col p-5">
+        <Skeleton className="mb-2 h-[16px] w-11/12" />
+        <Skeleton className="mb-3 h-[16px] w-2/3" />
+        <Skeleton className="mb-3 h-[12px] w-1/2" />
+        <Skeleton className="mt-auto h-[12px] w-20" />
+      </div>
+    </div>
+  )
+}
+
+const CARDS = { service: SkeletonServiceCard, project: SkeletonProjectCard, offer: SkeletonOfferCard, book: SkeletonBookCard }
+
 /** A row of `count` skeletons, wrapped so it drops straight into the same grid as the real cards. */
 export function SkeletonGrid({ count = 3, variant = 'service' }) {
-  const Card = variant === 'project' ? SkeletonProjectCard : SkeletonServiceCard
+  const Card = CARDS[variant] ?? SkeletonServiceCard
   return (
     <>
       {Array.from({ length: count }, (_, i) => (

@@ -5,6 +5,7 @@ import { useLang } from '../i18n/LanguageContext'
 import { toHttpUrl } from '../lib/url'
 import Icon from '../components/Icon'
 import PageTitle from '../components/PageTitle'
+import Skeleton from '../components/fx/Skeleton'
 import { BOOK_ICON, BookCover, EYE_ICON } from './Library'
 
 const DOWNLOAD_ICON = '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>'
@@ -13,6 +14,29 @@ const DOWNLOAD_ICON = '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><pol
 export function fileSize(bytes) {
   if (!bytes) return ''
   return bytes >= 1024 * 1024 ? `${Math.round((bytes / 1024 / 1024) * 10) / 10} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`
+}
+
+/** The page's own layout while the book loads: cover, title, author, the two buttons and the description. */
+function BookDetailSkeleton() {
+  return (
+    <div className="mx-auto max-w-site px-[26px] pb-[90px] pt-10" aria-busy="true">
+      <Skeleton className="mb-8 h-[14px] w-36" />
+      <div data-grid2 className="grid items-start gap-10" style={{ gridTemplateColumns: 'minmax(0, 300px) 1fr' }}>
+        <Skeleton className="mx-auto w-full max-w-[300px] !rounded-2xl" style={{ aspectRatio: '3 / 4' }} />
+        <div>
+          <Skeleton className="mb-4 h-[12px] w-28" />
+          <Skeleton className="mb-3 h-[36px] w-3/4" />
+          <Skeleton className="mb-6 h-[16px] w-1/3" />
+          <Skeleton className="mb-8 h-[14px] w-40" />
+          <div className="mb-9 flex gap-3.5">
+            <Skeleton className="h-[50px] w-44 !rounded-xl" />
+            <Skeleton className="h-[50px] w-44 !rounded-xl" />
+          </div>
+          {['w-full', 'w-full', 'w-11/12', 'w-4/5', 'w-2/3'].map((w, i) => <Skeleton key={i} className={`mb-3 h-[14px] ${w}`} />)}
+        </div>
+      </div>
+    </div>
+  )
 }
 
 /** /library/:slug — a book's cover, description and details, with "Read the book" and "Download". */
@@ -27,7 +51,8 @@ export default function BookDetail() {
   }, [slug])
 
   if (book === false) return <div className="mx-auto max-w-narrow px-[26px] py-24 text-center text-muted">{t.libNotFound}</div>
-  if (!book) return <div className="mx-auto max-w-narrow px-[26px] py-24 text-center text-muted">…</div>
+  if (!book) return <BookDetailSkeleton />
+
 
   const title = pick(book, 'title')
   const downloadHref = toHttpUrl(book.download_url)

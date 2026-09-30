@@ -393,6 +393,35 @@
 @keyframes ngpSpin { to { transform: rotate(360deg) } }
 @media (prefers-reduced-motion: reduce) { .ngp-spinner { animation: none } }
 
+/* Progress of a download whose size is known (the book reader fetching its PDF). With no size yet
+   it runs as a sliding "indeterminate" bar instead of sitting at 0%. */
+.ngp-progress {
+  position: relative;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .08);
+}
+.ngp-progress > span {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), var(--accent-lighter));
+  transition: width .25s ease-out;
+}
+.ngp-progress[data-indeterminate] > span {
+  width: 35%;
+  animation: ngpIndeterminate 1.2s ease-in-out infinite;
+}
+@keyframes ngpIndeterminate { from { transform: translateX(-110%) } to { transform: translateX(310%) } }
+[dir='rtl'] .ngp-progress[data-indeterminate] > span { animation-direction: reverse }
+@media (prefers-reduced-motion: reduce) { .ngp-progress[data-indeterminate] > span { animation: none } }
+
+/* A PDF page appears over its placeholder once drawn, instead of popping in. */
+.ngp-page-canvas { opacity: 0; transition: opacity .35s ease-out }
+.ngp-page-canvas[data-ready] { opacity: 1 }
+
 /* ---------- section rhythm ---------- */
 
 /* One spacing scale for every section on the page. Before this each section carried its own

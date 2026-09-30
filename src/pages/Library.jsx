@@ -68,7 +68,7 @@ export default function Library() {
       {failed && <p role="status" className="py-10 text-center text-muted">{t.loadError}</p>}
       {!failed && books?.length === 0 && <p className="py-10 text-center text-muted">{t.libEmpty}</p>}
       <div data-stagger className="grid gap-[18px]" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(clamp(150px, 42vw, 210px), 1fr))' }}>
-        {books === null ? <SkeletonGrid count={4} /> : books.map((book) => <BookCard key={book.id} book={book} />)}
+        {books === null ? <SkeletonGrid count={8} variant="book" /> : books.map((book) => <BookCard key={book.id} book={book} />)}
       </div>
     </div>
   )
