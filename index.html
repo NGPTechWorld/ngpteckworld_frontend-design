@@ -7,8 +7,12 @@
          rewrite and came back as the HTML of the home page with a 200 — which a crawler cannot
          read as an image, and which is a worse answer than a plain 404. Google also wants a
          multiple of 48px square; the old icon was 64. -->
-    <link rel="icon" href="/favicon.ico" sizes="48x48" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- `any` rather than a size: the .ico carries 16, 32 and 48, and a browser picking an icon
+         for a 16px tab skips a candidate that declares only 48. There is deliberately no SVG
+         here. The one this site had was not a vector at all — a PNG in an SVG wrapper — so it
+         offered nothing the PNGs below do not, while being the candidate a browser prefers over
+         all of them because a scalable icon always looks like the best match. -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
