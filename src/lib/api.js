@@ -31,6 +31,9 @@ export const api = {
   getOffers: async () => (await req('/offers')).data,
   getOffer: async (slug) => (await req(`/offers/${encodeURIComponent(slug)}`)).data,
   postOfferRequest: (slug, payload) => req(`/offers/${encodeURIComponent(slug)}/requests`, { method: 'POST', body: JSON.stringify(payload) }),
+  getBooks: async () => (await req('/books')).data,
+  getBook: async (slug) => (await req('/books/' + encodeURIComponent(slug))).data,
+  readBook: (slug) => req('/books/' + encodeURIComponent(slug) + '/read', { method: 'POST' }),
   // Records this visit and answers with the new total, in one request. A POST because it
   // writes; the server deduplicates, so calling it on every page load is not a problem.
   recordVisit: async () => (await req('/visits', { method: 'POST' })).data,

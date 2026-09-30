@@ -52,6 +52,7 @@ export default {
       testimonials: 'آراء العملاء',
       offers: 'العروض',
       'offer-requests': 'طلبات العروض',
+      library: 'المكتبة',
     },
   },
   en: {
@@ -103,6 +104,7 @@ export default {
       testimonials: 'Testimonials',
       offers: 'Offers',
       'offer-requests': 'Offer requests',
+      library: 'Library',
     },
   },
 }

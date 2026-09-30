@@ -12,7 +12,7 @@ export default function Navbar() {
   const shown = useSections()
   const links = [
     ['/', t.navHome], ['/services', t.navServices, 'services'], ['/portfolio', t.navPortfolio, 'portfolio'],
-    ['/team', t.navTeam, 'team'], ['/offers', t.navOffers, 'offers'], ['/about', t.navAbout, 'about'], ['/contact', t.navContact],
+    ['/team', t.navTeam, 'team'], ['/offers', t.navOffers, 'offers'], ['/library', t.navLibrary, 'library'], ['/about', t.navAbout, 'about'], ['/contact', t.navContact],
   ].filter(([, , section]) => !section || shown(section))
   return (
     <nav className="sticky top-0 z-50 border-b border-[var(--border)]" style={{ backdropFilter: 'blur(16px)', background: 'rgba(26,15,38,.78)' }}>

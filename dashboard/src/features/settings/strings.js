@@ -46,6 +46,7 @@ export default {
       team: 'فريقنا',
       about: 'من نحن',
       offers: 'العروض',
+      library: 'المكتبة',
       intro: 'الفقرة التعريفية',
       stats: 'الأرقام والإحصائيات',
       process: 'مراحل العمل',
@@ -61,6 +62,7 @@ export default {
       team: 'الصفحة وصفحات الأعضاء والتبويب',
       about: 'الصفحة والتبويب',
       offers: 'الصفحة وصفحات العروض والتبويب',
+      library: 'الصفحة وصفحات الكتب وقارئ الكتب والتبويب',
     },
 
     discard: 'تجاهل التغييرات',
@@ -112,6 +114,7 @@ export default {
       team: 'Team',
       about: 'About',
       offers: 'Offers',
+      library: 'Library',
       intro: 'Intro paragraph',
       stats: 'Stats',
       process: 'How we work',
@@ -127,6 +130,7 @@ export default {
       team: 'Page, member pages and menu tab',
       about: 'Page and menu tab',
       offers: 'Page, offer pages and menu tab',
+      library: 'Page, book pages, the book reader and menu tab',
     },
 
     discard: 'Discard changes',

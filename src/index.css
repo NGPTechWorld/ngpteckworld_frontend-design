@@ -19,6 +19,13 @@ input,textarea,button{font-family:inherit}
 html[lang="ru"] [dir="ltr"],html[lang="ru"] .font-poppins{font-family:'Montserrat','Poppins',sans-serif}
 /* burger hidden on desktop; shown on mobile via media query below */
 [data-burger]{display:none}
+/* Eight menu links (with Offers and Library) do not fit beside the logo and the controls below ~1180px,
+   longer languages (de, ru) least of all: the menu folds into the burger there, before the grids do. */
+@media (max-width:1180px){
+  [data-navlinks]{display:none!important}
+  [data-burger]{display:inline-flex!important}
+  [data-navctrls]{margin-inline-start:auto!important}
+}
 @media (max-width:860px){
   [data-navlinks]{display:none!important}
   [data-burger]{display:inline-flex!important}

@@ -22,6 +22,7 @@ export default function Footer() {
             {shown('portfolio') && <Link to="/portfolio" className="hover:text-white">{t.navPortfolio}</Link>}
             {shown('team') && <Link to="/team" className="hover:text-white">{t.navTeam}</Link>}
             {shown('offers') && <Link to="/offers" className="hover:text-white">{t.navOffers}</Link>}
+            {shown('library') && <Link to="/library" className="hover:text-white">{t.navLibrary}</Link>}
             {shown('about') && <Link to="/about" className="hover:text-white">{t.navAbout}</Link>}
           </div>
         </div>

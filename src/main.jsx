@@ -18,6 +18,9 @@ const TeamMemberDetail = lazy(() => import('./pages/TeamMemberDetail'))
 const About = lazy(() => import('./pages/About'))
 const Offers = lazy(() => import('./pages/Offers'))
 const OfferDetail = lazy(() => import('./pages/OfferDetail'))
+const Library = lazy(() => import('./pages/Library'))
+const BookDetail = lazy(() => import('./pages/BookDetail'))
+const BookReader = lazy(() => import('./pages/BookReader'))
 const Contact = lazy(() => import('./pages/Contact'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
@@ -35,6 +38,9 @@ const router = createBrowserRouter([
     { path: 'about', element: gated('about', <About />) },
     { path: 'offers', element: gated('offers', <Offers />) },
     { path: 'offers/:slug', element: gated('offers', <OfferDetail />) },
+    { path: 'library', element: gated('library', <Library />) },
+    { path: 'library/:slug', element: gated('library', <BookDetail />) },
+    { path: 'library/:slug/read', element: gated('library', <BookReader />) },
     { path: 'contact', element: <Contact /> },
     { path: '*', element: <NotFound /> },
   ]},
