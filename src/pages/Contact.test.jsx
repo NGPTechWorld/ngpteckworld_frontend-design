@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { act, render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 import { vi } from 'vitest'
 import { LanguageProvider } from '../i18n/LanguageContext'
 import { SiteSettingsProvider, DEFAULT_SETTINGS } from '../lib/SiteSettings'
@@ -10,16 +11,25 @@ vi.mock('../lib/api', () => ({ api: { postContact: vi.fn(), getSettings: vi.fn()
 
 const t = ui.ar
 const settings = { ...DEFAULT_SETTINGS, email: 'hello@example.com', phone: '+1 555 0100' }
-const services = [{ id: 1, title_ar: 'تصميم مواقع', title_en: 'Web design' }]
+const services = [
+  { id: 1, slug: 'web-design', title_ar: 'تصميم مواقع', title_en: 'Web design' },
+  { id: 4, slug: 'mobile-apps', title_ar: 'تطبيقات الموبايل', title_en: 'Mobile Apps' },
+]
 
-const renderContact = () =>
+// The page reads ?service= off the URL, so it needs a router even for the tests that do not.
+const renderContact = (url = '/contact') =>
   render(
-    <LanguageProvider>
-      <SiteSettingsProvider>
-        <Contact />
-      </SiteSettingsProvider>
-    </LanguageProvider>,
+    <MemoryRouter initialEntries={[url]}>
+      <LanguageProvider>
+        <SiteSettingsProvider>
+          <Contact />
+        </SiteSettingsProvider>
+      </LanguageProvider>
+    </MemoryRouter>,
   )
+
+/** The label the service button shows — the placeholder until something is chosen. */
+const chosenService = () => screen.getByRole('button', { name: /تصميم مواقع|تطبيقات الموبايل|اختر الخدمة/ }).textContent
 
 async function selectService(label = 'تصميم مواقع') {
   fireEvent.click(screen.getByRole('button', { name: t.fService }))
@@ -206,5 +216,58 @@ describe('service picker', () => {
     renderContact()
     expect(await screen.findByPlaceholderText(t.fName)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: t.fService })).toBeInTheDocument()
+  })
+})
+
+describe('a link that names a service', () => {
+  beforeEach(() => {
+    api.getSettings.mockResolvedValue(settings)
+    api.getServices.mockResolvedValue(services)
+  })
+
+  it('opens with that service chosen', async () => {
+    renderContact('/contact?service=mobile-apps')
+
+    await waitFor(() => expect(chosenService()).toContain('تطبيقات الموبايل'))
+  })
+
+  it('accepts the id too, for a service that has no slug yet', async () => {
+    renderContact('/contact?service=4')
+
+    await waitFor(() => expect(chosenService()).toContain('تطبيقات الموبايل'))
+  })
+
+  it('waits for the list instead of setting a value that is not there yet', async () => {
+    // The select is empty until the API answers; reading the URL on mount alone would choose
+    // nothing and then never try again.
+    let release
+    api.getServices.mockReturnValue(new Promise((resolve) => { release = resolve }))
+    renderContact('/contact?service=mobile-apps')
+
+    expect(chosenService()).toBe(t.fService)
+    await act(async () => { release(services) })
+    await waitFor(() => expect(chosenService()).toContain('تطبيقات الموبايل'))
+  })
+
+  it('ignores a name no service answers to, rather than showing an error', async () => {
+    renderContact('/contact?service=does-not-exist')
+
+    await waitFor(() => expect(api.getServices).toHaveBeenCalled())
+    expect(chosenService()).toBe(t.fService)
+  })
+
+  it('leaves the form alone when the link names nothing', async () => {
+    renderContact('/contact')
+
+    await waitFor(() => expect(api.getServices).toHaveBeenCalled())
+    expect(chosenService()).toBe(t.fService)
+  })
+
+  it('preselects without locking — the visitor can still change it', async () => {
+    renderContact('/contact?service=mobile-apps')
+    await waitFor(() => expect(chosenService()).toContain('تطبيقات الموبايل'))
+
+    await selectService('تصميم مواقع')
+    expect(chosenService()).toContain('تصميم مواقع')
   })
 })

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { api } from '../lib/api'
 import { useLang } from '../i18n/LanguageContext'
 import { useSiteSettings, SOCIAL_KEYS } from '../lib/SiteSettings'
@@ -45,6 +46,7 @@ function FieldError({ id, text }) {
 export default function Contact() {
   const { t, pick } = useLang()
   const settings = useSiteSettings()
+  const [searchParams] = useSearchParams()
   const [services, setServices] = useState([])
   const [form, setForm] = useState(EMPTY_FORM)
   const [fieldErrors, setFieldErrors] = useState({})
@@ -54,6 +56,21 @@ export default function Contact() {
   const [cooldown, setCooldown] = useState(0)
 
   useEffect(() => { api.getServices().then(setServices).catch(() => setServices([])) }, [])
+
+  // /contact?service=mobile-apps arrives with the service already chosen. These links go into
+  // adverts and messages, so the slug is what they carry; the id is accepted too because it is
+  // stable even when nobody has given the service a slug yet.
+  //
+  // It waits for the list rather than reading the URL once: the select has no options until the
+  // API answers, so applying it on mount would set a value that is not there yet. An unknown
+  // value is simply ignored — a mistyped link should open an ordinary contact form, not an error.
+  useEffect(() => {
+    const wanted = searchParams.get('service')
+    if (!wanted || services.length === 0) return
+    const match = services.find((s) => s.slug === wanted || String(s.id) === wanted)
+    // Never overwrite a choice already made — the list can arrive after the visitor has picked.
+    if (match) setForm((f) => (f.service_id ? f : { ...f, service_id: String(match.id) }))
+  }, [searchParams, services])
 
   // Ticks the post-send cooldown down to 0, one second at a time.
   useEffect(() => {
