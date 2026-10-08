@@ -32,7 +32,7 @@ const PROJECT = {
 }
 
 /** Stand in for both the shell fetch and the API call. */
-function mockFetch({ member = null, project = null } = {}) {
+function mockFetch({ member = null, project = null, content = null } = {}) {
   vi.stubGlobal('fetch', vi.fn(async (url) => {
     const href = String(url)
     if (href.endsWith('/index.html')) return { ok: true, text: async () => SHELL }
@@ -41,6 +41,9 @@ function mockFetch({ member = null, project = null } = {}) {
     }
     if (href.includes('/projects/')) {
       return project ? { ok: true, json: async () => ({ data: project }) } : { ok: false }
+    }
+    if (href.endsWith('/content')) {
+      return content ? { ok: true, json: async () => ({ data: content }) } : { ok: false }
     }
     return { ok: false }
   }))
@@ -135,5 +138,68 @@ describe('share previews', () => {
     expect(res.body).toContain('&quot;خاص&quot;')
     expect(res.body).toContain('&lt;script&gt;')
     expect(res.body).toContain('وصف &amp; رموز')
+  })
+})
+
+describe('the fixed pages', () => {
+  it('gives each one its own title, description and canonical', async () => {
+    // They were all served the same index.html, so Google saw six identical documents and left
+    // them in "discovered, not indexed" without ever crawling them.
+    mockFetch({})
+    const res = makeResponse()
+    await handler(request('type=page&slug=about'), res)
+
+    expect(res.statusCode).toBe(200)
+    expect(res.body).toContain('<title>من نحن | NGP TechWorld</title>')
+    expect(res.body).toContain('rel="canonical" href="https://www.ngptechworld.com/about"')
+    expect(res.body).toContain('property="og:url" content="https://www.ngptechworld.com/about"')
+  })
+
+  it('prefers the heading the dashboard actually publishes', async () => {
+    mockFetch({ content: { texts: { contactTitle: { ar: 'لنبدأ الحديث', en: "Let's talk" }, contactSub: { ar: 'نعود إليك خلال 24 ساعة.', en: '' } } } })
+    const res = makeResponse()
+    await handler(request('type=page&slug=contact'), res)
+
+    expect(res.body).toContain('<title>لنبدأ الحديث | NGP TechWorld</title>')
+    expect(res.body).toContain('content="نعود إليك خلال 24 ساعة."')
+  })
+
+  it('falls back to its own wording when the dashboard has none', async () => {
+    mockFetch({ content: { texts: { contactTitle: { ar: '   ', en: '' } } } })
+    const res = makeResponse()
+    await handler(request('type=page&slug=contact'), res)
+
+    // Blank is not a title; a page with none is the problem this exists to fix.
+    expect(res.body).toContain('<title>تواصل معنا | NGP TechWorld</title>')
+  })
+
+  it('still answers when the API is unreachable', async () => {
+    vi.stubGlobal('fetch', vi.fn(async (url) => {
+      if (String(url).endsWith('/index.html')) return { ok: true, text: async () => SHELL }
+      throw new Error('network down')
+    }))
+    const res = makeResponse()
+    await handler(request('type=page&slug=services'), res)
+
+    expect(res.statusCode).toBe(200)
+    expect(res.body).toContain('<title>خدماتنا | NGP TechWorld</title>')
+  })
+
+  it('leaves the shell alone for a page it does not know', async () => {
+    mockFetch({})
+    const res = makeResponse()
+    await handler(request('type=page&slug=nowhere'), res)
+
+    expect(res.statusCode).toBe(200)
+    expect(res.body).toContain('NGP TechWorld — نبني مستقبلك الرقمي')
+  })
+
+  it('keeps the app booting — the page is still the SPA', async () => {
+    mockFetch({})
+    const res = makeResponse()
+    await handler(request('type=page&slug=team'), res)
+
+    expect(res.body).toContain('/assets/index-abc123.js')
+    expect(res.body).toContain('<div id="app">')
   })
 })

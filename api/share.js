@@ -77,6 +77,65 @@ async function fetchJson(path) {
 /** The Arabic field with the English one as the fallback, since the site defaults to Arabic. */
 const pick = (record, key) => record?.[`${key}_ar`] || record?.[`${key}_en`] || ''
 
+/**
+ * The site's fixed pages.
+ *
+ * Every one of them was being served the same index.html, which meant the same <title>, the same
+ * description and the same canonical for /about as for /contact. Google's first look at them was
+ * therefore six identical documents, and it left thirteen of them in "discovered, not indexed" —
+ * never crawled, because nothing in the markup suggested there was anything new to crawl.
+ *
+ * `texts` is the key each page's heading has in GET /api/content, so the title the crawler reads
+ * is the heading the admin actually set rather than a second copy drifting out of step with it.
+ * `fallback` is what stands in when the API is unreachable — never nothing, since a page with no
+ * title is the problem this exists to fix.
+ */
+const PAGES = {
+  about: {
+    texts: ['aboutTitle', 'aboutStory'],
+    fallback: ['من نحن', 'تعرّف على NGP TechWorld: قصتنا ورؤيتنا وقيمنا وفريق المهندسين والمصممين الذي يبني حلولك الرقمية.'],
+  },
+  services: {
+    texts: ['servicesTitle', 'servicesSub'],
+    fallback: ['خدماتنا', 'تطوير مواقع وتطبيقات، تصميم UI/UX، أنظمة ERP و CRM، حلول سحابية وذكاء اصطناعي، ودعم وصيانة.'],
+  },
+  portfolio: {
+    texts: ['portfolioTitle', 'portfolioSub'],
+    fallback: ['معرض الأعمال', 'مشاريع أنجزناها لعملاء في قطاعات متنوعة — مواقع وتطبيقات وأنظمة إدارية وحلول ذكاء اصطناعي.'],
+  },
+  contact: {
+    texts: ['contactTitle', 'contactSub'],
+    fallback: ['تواصل معنا', 'أخبرنا عن مشروعك وسنعود إليك خلال 24 ساعة. اطلب عرض سعر لتطوير موقع أو تطبيق أو نظام.'],
+  },
+  team: {
+    // The team page has no dashboard-managed heading, so it is only ever the fallback.
+    texts: [],
+    fallback: ['فريقنا', 'المهندسون والمصممون في NGP TechWorld — الأشخاص الذين يحوّلون أفكارك إلى منتجات برمجية حقيقية.'],
+  },
+}
+
+async function describePage(name, url) {
+  const page = PAGES[name]
+  if (!page) return null
+
+  const content = await fetchJson('/content').catch(() => null)
+  const texts = content?.texts ?? {}
+  // The Arabic wording, matching the language the shell itself is served in.
+  const fromDashboard = (key) => (typeof texts?.[key]?.ar === 'string' ? texts[key].ar.trim() : '')
+
+  const [titleKey, descriptionKey] = page.texts
+  const [titleFallback, descriptionFallback] = page.fallback
+
+  const heading = fromDashboard(titleKey) || titleFallback
+  const description = fromDashboard(descriptionKey) || descriptionFallback
+
+  return tags({
+    title: `${heading} | NGP TechWorld`,
+    description: summarise(description),
+    url,
+  })
+}
+
 async function describeTeamMember(slug, url) {
   const member = await fetchJson(`/team/${encodeURIComponent(slug)}`)
   if (!member) return null
@@ -124,14 +183,14 @@ export default async function handler(request, response) {
   // names in it are always the ones this deployment actually built.
   const shell = await fetch(`${origin}/index.html`).then((r) => r.text())
 
-  const path = type === 'team' ? `/team/${slug}` : `/portfolio/${slug}`
+  const path = type === 'page' ? `/${slug}` : type === 'team' ? `/team/${slug}` : `/portfolio/${slug}`
   const url = `${SITE}${path}`
 
   let replacement = null
   try {
-    replacement = type === 'team'
-      ? await describeTeamMember(slug, url)
-      : await describeProject(slug, url)
+    if (type === 'page') replacement = await describePage(slug, url)
+    else if (type === 'team') replacement = await describeTeamMember(slug, url)
+    else replacement = await describeProject(slug, url)
   } catch {
     // An API hiccup must not take the page down with it — fall through to the site's own tags.
     replacement = null
